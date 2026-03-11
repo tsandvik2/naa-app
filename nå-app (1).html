@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NÅ – Hva gjør vi nå?</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #0c0c12; --card: #16161f; --accent: #ff3c6e;
+  --yellow: #ffe600; --cyan: #00e0ff;
+  --text: #f2f2f7; --muted: #55556a; --border: #2a2a38; --snap: #FFFC00;
+}
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; justify-content: center; }
+body::after { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 500px 350px at 10% 0%, rgba(255,60,110,0.07) 0%, transparent 60%), radial-gradient(ellipse 400px 300px at 90% 100%, rgba(0,224,255,0.05) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+.app { width: 100%; max-width: 430px; min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; padding: 0 18px 80px; }
+.header { padding: 36px 0 20px; text-align: center; }
+.logo { font-family: 'Syne', sans-serif; font-size: 56px; font-weight: 800; letter-spacing: -3px; background: linear-gradient(120deg, var(--accent) 0%, var(--yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
+.tagline { font-size: 13px; color: var(--muted); margin-top: 4px; letter-spacing: 0.8px; text-transform: uppercase; }
+.screen { display: none; }
+.screen.active { display: flex; flex-direction: column; gap: 18px; animation: up 0.35s ease; }
+@keyframes up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.q { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 700; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.sel-btn { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 14px 10px; cursor: pointer; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; text-align: center; transition: all 0.15s; line-height: 1.3; }
+.sel-btn .em { font-size: 26px; display: block; margin-bottom: 5px; }
+.sel-btn:active { transform: scale(0.96); }
+.sel-btn.on  { border-color: var(--accent);  background: rgba(255,60,110,0.1); }
+.sel-btn.on-y { border-color: var(--yellow); background: rgba(255,230,0,0.08); color: var(--yellow); }
+.sel-btn.on-c { border-color: var(--cyan);   background: rgba(0,224,255,0.07); color: var(--cyan); }
+.age-row { display: flex; background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 4px; gap: 4px; }
+.age-opt { flex: 1; padding: 10px 6px; border-radius: 10px; border: none; background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.age-opt.on { background: var(--accent); color: white; }
+.btn { width: 100%; padding: 17px; border-radius: 16px; border: none; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; cursor: pointer; transition: all 0.15s; letter-spacing: 0.3px; }
+.btn:active { transform: scale(0.97); }
+.btn-red { background: linear-gradient(120deg, var(--accent), #ff6535); color: white; }
+.btn-red:hover { box-shadow: 0 6px 24px rgba(255,60,110,0.3); }
+.btn-ghost { background: transparent; border: 2px solid var(--border); color: var(--muted); font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; }
+.btn-ghost:hover { color: var(--text); border-color: #444458; }
+.btn-snap { background: var(--snap); color: #000; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; }
+.btn-snap:hover { box-shadow: 0 6px 24px rgba(255,252,0,0.25); }
+.c-card { background: var(--card); border-radius: 22px; border: 2px solid var(--border); overflow: hidden; }
+.c-top { height: 4px; background: linear-gradient(90deg, var(--accent), var(--yellow), var(--cyan)); }
+.c-body { padding: 22px 20px 20px; }
+.c-badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; margin-bottom: 14px; }
+.b-easy { background: rgba(0,224,255,0.1); color: var(--cyan); }
+.b-med  { background: rgba(255,230,0,0.1);  color: var(--yellow); }
+.b-wild { background: rgba(255,60,110,0.12); color: var(--accent); }
+.c-text { font-family: 'Syne', sans-serif; font-size: 21px; font-weight: 700; line-height: 1.35; margin-bottom: 18px; }
+.c-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.c-tag { font-size: 12px; color: var(--muted); background: rgba(255,255,255,0.04); padding: 4px 10px; border-radius: 8px; }
+.punish-card { background: rgba(255,60,110,0.05); border: 2px solid rgba(255,60,110,0.18); border-radius: 16px; padding: 16px 18px; text-align: center; }
+.punish-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.punish-text { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; line-height: 1.3; }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-half { padding: 14px; border-radius: 14px; border: 2px solid var(--border); background: var(--card); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-half:hover { border-color: #444458; }
+.btn-half:active { transform: scale(0.96); }
+.invite-box { background: var(--card); border: 2px solid var(--border); border-radius: 20px; padding: 24px 20px; text-align: center; }
+.invite-big { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; letter-spacing: 6px; background: linear-gradient(120deg, var(--accent), var(--yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 14px 0 10px; }
+.invite-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.join-row { display: flex; gap: 8px; }
+.join-input { flex: 1; padding: 13px 14px; background: var(--bg); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; outline: none; text-transform: uppercase; letter-spacing: 2px; }
+.join-input:focus { border-color: var(--cyan); }
+.join-btn { padding: 13px 16px; background: var(--cyan); border: none; border-radius: 12px; color: #000; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 14px; cursor: pointer; }
+.load-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 20px; }
+.dots { display: flex; gap: 8px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; animation: boing 1.1s infinite; }
+.dot:nth-child(1) { background: var(--accent); }
+.dot:nth-child(2) { background: var(--yellow); animation-delay: 0.18s; }
+.dot:nth-child(3) { background: var(--cyan); animation-delay: 0.36s; }
+@keyframes boing { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-14px); } }
+.load-txt { color: var(--muted); font-size: 14px; }
+.hint { font-size: 13px; color: var(--accent); display: none; padding: 10px 14px; background: rgba(255,60,110,0.08); border-radius: 10px; }
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: var(--bg); padding: 11px 22px; border-radius: 100px; font-size: 14px; font-weight: 600; transition: transform 0.28s cubic-bezier(.34,1.56,.64,1); z-index: 999; white-space: nowrap; pointer-events: none; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.cf { position: fixed; inset: 0; pointer-events: none; z-index: 900; }
+.cp { position: absolute; animation: fall 2.2s ease-in forwards; }
+@keyframes fall { from { opacity: 1; transform: translateY(-10px) rotate(0deg); } to { opacity: 0; transform: translateY(100vh) rotate(540deg); } }
+
+/* Share card overlay */
+.share-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 800; align-items: center; justify-content: center; padding: 20px; }
+.share-overlay.show { display: flex; }
+.share-card {
+  width: 100%; max-width: 360px;
+  background: linear-gradient(135deg, #1a0a1e 0%, #0c0c1a 50%, #0a1a1a 100%);
+  border-radius: 28px;
+  padding: 32px 24px 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.share-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--yellow), var(--cyan));
+}
+.share-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 300px 200px at 50% 0%, rgba(255,60,110,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.share-logo { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; background: linear-gradient(120deg, var(--accent), var(--yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
+.share-sub { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; }
+.share-badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; }
+.share-challenge { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.35; color: var(--text); margin-bottom: 20px; position: relative; z-index: 1; }
+.share-code-box { background: rgba(255,255,255,0.05); border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; }
+.share-code-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
+.share-code-val { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 4px; background: linear-gradient(120deg, var(--accent), var(--yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.share-cta { font-size: 13px; color: var(--muted); }
+.share-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+.share-close { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,0.08); border: none; color: var(--muted); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">NÅ</div>
+    <div class="tagline">Hva gjør vi nå?</div>
+  </div>
+
+  <!-- SETUP -->
+  <div class="screen active" id="s-setup">
+    <div class="q">Hvordan har du det? 👀</div>
+    <div class="grid2">
+      <button class="sel-btn" onclick="pick(this,'mood','Energisk','m')"><span class="em">⚡</span>Energisk</button>
+      <button class="sel-btn" onclick="pick(this,'mood','Avslappet','m')"><span class="em">😌</span>Avslappet</button>
+      <button class="sel-btn" onclick="pick(this,'mood','Lei og rastløs','m')"><span class="em">😑</span>Lei meg</button>
+      <button class="sel-btn" onclick="pick(this,'mood','Klar for galskap','m')"><span class="em">🤪</span>Full kaos</button>
+    </div>
+    <div class="q">Hvor mye tid? ⏱</div>
+    <div class="grid3">
+      <button class="sel-btn" onclick="pick(this,'time','10 min','t')">10 min</button>
+      <button class="sel-btn" onclick="pick(this,'time','30 min','t')">30 min</button>
+      <button class="sel-btn" onclick="pick(this,'time','1 time','t')">1 time</button>
+      <button class="sel-btn" onclick="pick(this,'time','2+ timer','t')">2+ timer</button>
+      <button class="sel-btn" onclick="pick(this,'time','Hele kvelden','t')">Hele kvelden</button>
+      <button class="sel-btn" onclick="pick(this,'time','Litt tid','t')">Vet ikke</button>
+    </div>
+    <div class="q">Hvor mange er dere? 👥</div>
+    <div class="grid4">
+      <button class="sel-btn" onclick="pick(this,'players',1,'p')">Bare<br>meg</button>
+      <button class="sel-btn" onclick="pick(this,'players',2,'p')">2<br>pers.</button>
+      <button class="sel-btn" onclick="pick(this,'players',3,'p')">3<br>pers.</button>
+      <button class="sel-btn" onclick="pick(this,'players','4+','p')">4+<br>pers.</button>
+    </div>
+    <div class="q">Alder? 🎂</div>
+    <div class="age-row">
+      <button class="age-opt on" onclick="pickAge(this,'13-15')">13–15</button>
+      <button class="age-opt"    onclick="pickAge(this,'16-19')">16–19</button>
+      <button class="age-opt"    onclick="pickAge(this,'20+')">20+</button>
+    </div>
+    <div class="hint" id="hint">Velg humør, tid og antall for å fortsette 👆</div>
+    <button class="btn btn-red" onclick="start()">Gi meg en utfordring 🎯</button>
+  </div>
+
+  <!-- LOADING -->
+  <div class="screen" id="s-load">
+    <div class="load-wrap">
+      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="load-txt">Finner noe gøyalt for deg...</div>
+    </div>
+  </div>
+
+  <!-- CHALLENGE -->
+  <div class="screen" id="s-challenge">
+    <div class="c-card">
+      <div class="c-top"></div>
+      <div class="c-body">
+        <div class="c-badge b-easy" id="c-badge">🟢 Lett</div>
+        <div class="c-text" id="c-text">–</div>
+        <div class="c-tags" id="c-tags"></div>
+      </div>
+    </div>
+    <div class="punish-card" id="punish-card" style="display:none">
+      <div class="punish-label">😈 Straff for taperen</div>
+      <div class="punish-text" id="punish-text"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-half" onclick="nextChallenge()">🔄 Ny utfordring</button>
+      <button class="btn-half" onclick="copyChallenge()">📋 Kopier tekst</button>
+    </div>
+    <button class="btn btn-snap" onclick="snapShare()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="black"><path d="M12 2C9.24 2 6.8 3.28 5.23 5.3 4.12 6.7 3.44 8.47 3.44 10.4c0 .36.03.72.08 1.06-.44.17-.9.27-1.37.27-.52 0-.97-.14-1.28-.14-.44 0-.74.24-.74.6 0 .38.27.68.8.9.54.22 1.28.4 1.6 1.1.07.17.1.35.1.54 0 .2-.04.42-.13.63-.5 1.28-1.46 2.22-2.6 2.76-.3.15-.44.36-.44.58 0 .4.44.74 1.3 1.02.3.1.63.18 1 .25.16.03.28.14.33.28.06.15.05.31-.01.46-.06.18-.13.35-.13.52 0 .3.2.52.6.52.2 0 .43-.05.7-.14.6-.2 1.18-.3 1.73-.3.47 0 .92.07 1.34.21.8.53 1.7.83 2.66.87h.2c.96-.04 1.86-.34 2.66-.87.42-.14.87-.21 1.34-.21.55 0 1.13.1 1.73.3.27.09.5.14.7.14.4 0 .6-.22.6-.52 0-.17-.07-.34-.13-.52-.06-.15-.07-.31-.01-.46.05-.14.17-.25.33-.28.37-.07.7-.15 1-.25.86-.28 1.3-.62 1.3-1.02 0-.22-.14-.43-.44-.58-1.14-.54-2.1-1.48-2.6-2.76-.09-.21-.13-.43-.13-.63 0-.19.03-.37.1-.54.32-.7 1.06-.88 1.6-1.1.53-.22.8-.52.8-.9 0-.36-.3-.6-.74-.6-.31 0-.76.14-1.28.14-.47 0-.93-.1-1.37-.27.05-.34.08-.7.08-1.06 0-1.93-.68-3.7-1.79-5.1C17.2 3.28 14.76 2 12 2z"/></svg>
+      Del på Snapchat
+    </button>
+    <button class="btn btn-red" id="btn-invite" onclick="goInvite()" style="display:none">📨 Utfordre en venn!</button>
+    <button class="btn btn-ghost" onclick="show('s-setup')">← Endre valg</button>
+  </div>
+
+  <!-- INVITE -->
+  <div class="screen" id="s-invite">
+    <div class="invite-box">
+      <div style="font-size:44px">👯</div>
+      <div style="font-family:'Syne',sans-serif;font-size:19px;font-weight:700;margin-top:12px">Send koden til vennen din!</div>
+      <div class="invite-big" id="inv-code">NÅ-???</div>
+      <div class="invite-desc">Vennen din skriver inn koden og dere får <strong>samme utfordring</strong>. Den som ikke gjør det får straffen! 😄</div>
+    </div>
+    <button class="btn btn-snap" onclick="snapInvite()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="black"><path d="M12 2C9.24 2 6.8 3.28 5.23 5.3 4.12 6.7 3.44 8.47 3.44 10.4c0 .36.03.72.08 1.06-.44.17-.9.27-1.37.27-.52 0-.97-.14-1.28-.14-.44 0-.74.24-.74.6 0 .38.27.68.8.9.54.22 1.28.4 1.6 1.1.07.17.1.35.1.54 0 .2-.04.42-.13.63-.5 1.28-1.46 2.22-2.6 2.76-.3.15-.44.36-.44.58 0 .4.44.74 1.3 1.02.3.1.63.18 1 .25.16.03.28.14.33.28.06.15.05.31-.01.46-.06.18-.13.35-.13.52 0 .3.2.52.6.52.2 0 .43-.05.7-.14.6-.2 1.18-.3 1.73-.3.47 0 .92.07 1.34.21.8.53 1.7.83 2.66.87h.2c.96-.04 1.86-.34 2.66-.87.42-.14.87-.21 1.34-.21.55 0 1.13.1 1.73.3.27.09.5.14.7.14.4 0 .6-.22.6-.52 0-.17-.07-.34-.13-.52-.06-.15-.07-.31-.01-.46.05-.14.17-.25.33-.28.37-.07.7-.15 1-.25.86-.28 1.3-.62 1.3-1.02 0-.22-.14-.43-.44-.58-1.14-.54-2.1-1.48-2.6-2.76-.09-.21-.13-.43-.13-.63 0-.19.03-.37.1-.54.32-.7 1.06-.88 1.6-1.1.53-.22.8-.52.8-.9 0-.36-.3-.6-.74-.6-.31 0-.76.14-1.28.14-.47 0-.93-.1-1.37-.27.05-.34.08-.7.08-1.06 0-1.93-.68-3.7-1.79-5.1C17.2 3.28 14.76 2 12 2z"/></svg>
+      Send invitasjon på Snapchat
+    </button>
+    <button class="btn btn-red" onclick="copyInvite()">📋 Kopier invitasjon</button>
+    <div style="background:var(--card);border:2px solid var(--border);border-radius:18px;padding:20px;">
+      <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Har du fått en kode?</div>
+      <div class="join-row">
+        <input class="join-input" id="join-input" type="text" placeholder="NÅ-ABC" maxlength="6">
+        <button class="join-btn" onclick="joinCode()">Join!</button>
+      </div>
+    </div>
+    <button class="btn btn-ghost" onclick="show('s-challenge')">← Tilbake</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="cf" id="cf"></div>
+
+<!-- SHARE CARD OVERLAY -->
+<div class="share-overlay" id="share-overlay">
+  <div class="share-card" id="share-card">
+    <button class="share-close" onclick="closeShare()">✕</button>
+    <div class="share-logo">NÅ</div>
+    <div class="share-sub">Hva gjør vi nå?</div>
+    <div class="share-badge b-easy" id="share-badge">🟢 Lett</div>
+    <div class="share-challenge" id="share-challenge">–</div>
+    <div class="share-code-box">
+      <div class="share-code-label">Bruk denne koden</div>
+      <div class="share-code-val" id="share-code-val">NÅ-???</div>
+    </div>
+    <div class="share-cta">Skriv inn koden i NÅ-appen og ta utfordringen! 😏</div>
+    <div class="share-actions">
+      <button class="btn btn-snap" onclick="doSnapShare()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="black"><path d="M12 2C9.24 2 6.8 3.28 5.23 5.3 4.12 6.7 3.44 8.47 3.44 10.4c0 .36.03.72.08 1.06-.44.17-.9.27-1.37.27-.52 0-.97-.14-1.28-.14-.44 0-.74.24-.74.6 0 .38.27.68.8.9.54.22 1.28.4 1.6 1.1.07.17.1.35.1.54 0 .2-.04.42-.13.63-.5 1.28-1.46 2.22-2.6 2.76-.3.15-.44.36-.44.58 0 .4.44.74 1.3 1.02.3.1.63.18 1 .25.16.03.28.14.33.28.06.15.05.31-.01.46-.06.18-.13.35-.13.52 0 .3.2.52.6.52.2 0 .43-.05.7-.14.6-.2 1.18-.3 1.73-.3.47 0 .92.07 1.34.21.8.53 1.7.83 2.66.87h.2c.96-.04 1.86-.34 2.66-.87.42-.14.87-.21 1.34-.21.55 0 1.13.1 1.73.3.27.09.5.14.7.14.4 0 .6-.22.6-.52 0-.17-.07-.34-.13-.52-.06-.15-.07-.31-.01-.46.05-.14.17-.25.33-.28.37-.07.7-.15 1-.25.86-.28 1.3-.62 1.3-1.02 0-.22-.14-.43-.44-.58-1.14-.54-2.1-1.48-2.6-2.76-.09-.21-.13-.43-.13-.63 0-.19.03-.37.1-.54.32-.7 1.06-.88 1.6-1.1.53-.22.8-.52.8-.9 0-.36-.3-.6-.74-.6-.31 0-.76.14-1.28.14-.47 0-.93-.1-1.37-.27.05-.34.08-.7.08-1.06 0-1.93-.68-3.7-1.79-5.1C17.2 3.28 14.76 2 12 2z"/></svg>
+        Send på Snapchat (kopier + åpne)
+      </button>
+      <button class="btn btn-red" onclick="copyShareText()" style="font-size:15px">📋 Kopier tekst</button>
+      <button class="btn btn-ghost" onclick="closeShare()">Lukk</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const S = { mood: null, time: null, players: null, age: '13-15', challenge: null, punishment: null, code: null };
+
+const DB = {
+  easy: {
+    solo: [
+      { text: "Lag et selvportrett med bare emojis og send til en venn 🎨", cat: "kreativ" },
+      { text: "Finn det mest dramatiske du kan ta bilde av i rommet ditt akkurat nå 📸", cat: "kreativ" },
+      { text: "Skriv en 4-linjes rap om det kjedeligste objektet du ser 🎤", cat: "kreativ" },
+      { text: "Ring noen du ikke har snakket med på lenge, bare for å si hei 📞", cat: "sosial" },
+      { text: "Lag verdens rareste sandwich av det du har hjemme og ta et dramatisk bilde 🥪", cat: "kreativ" },
+      { text: "Dans til den første sangen på shuffle i 60 sekunder – gjør det skikkelig! 🕺", cat: "fysisk" },
+      { text: "Tegn et portrett av favorittpersonen din uten å løfte pennen fra papiret ✏️", cat: "kreativ" },
+    ],
+    group: [
+      { text: "Alle lager et ansikt av maten sin og sender bilde til gjengen. Beste vinner! 🍽️", cat: "kreativ", punish: "Taperen må sende et pinlig selfie til hele gjengen 😬" },
+      { text: "Hvem kan holde rett ansikt lengst mens de andre gjør grimaser? Film det! 😐", cat: "sosial", punish: "Taperen må poste et cringe-selfie på story i 10 minutter 📸" },
+      { text: "Alle skriver en 4-linjes rap om personen til høyre og leser dem høyt 🎤", cat: "kreativ", punish: "Dårligste rapper må synge rappen sin på voice memo og sende til alle 🎵" },
+      { text: "Hvem kan finne den rareste tingen i lommen/vesken sin? Alle viser frem! 👜", cat: "sosial", punish: "Den med kjedeligst gjenstand må bære den som 'halskjede' i 30 minutter 😄" },
+    ]
+  },
+  medium: {
+    solo: [
+      { text: "Hold en helt seriøs 1-minutts tale foran speilet om hvorfor du er Norges beste kokk. Film det! 🗣️", cat: "kreativ" },
+      { text: "Send en overdramatisk poetisk unnskyldning til noen for noe helt lite og uviktig 📜", cat: "sosial" },
+      { text: "Gå ut og finn noe blått innen 5 minutter. Ta et kunstnerisk bilde 🔵", cat: "fysisk" },
+      { text: "Bytt profilbilde til det mest dramatiske selfiet du kan ta – hold det i 24 timer 📷", cat: "sosial" },
+    ],
+    group: [
+      { text: "En person ringer en butikk og spør med alvorlig stemme om de har 'usynlig tape' 📞", cat: "sosial", punish: "Taperen må ringe en ny butikk og stille et enda rimeligere spørsmål 😂" },
+      { text: "Alle lager en 15-sekunders stumfilm med det som er rundt dere. Stem på den beste! 🎬", cat: "kreativ", punish: "Den dårligste regissøren må spille statist i gjengens neste film 🎭" },
+      { text: "Send til den 7. personen i kontaktlisten: 'Du vet hva du har gjort.' Vent på svar 😂", cat: "sosial", punish: "Den som ler først må sende samme melding til to nye kontakter 💀" },
+    ]
+  },
+  wild: {
+    solo: [
+      { text: "Gå inn i en tilfeldig butikk og spør med alvorlig ansikt om de har 'energikrystaller til hunden din' 🔮", cat: "sosial" },
+      { text: "Bestill noe på en kafé med en falsk aksent du holder hele bestillingen igjennom. Ingen latter! 🎭", cat: "sosial" },
+      { text: "Gå bort til en fremmed og si at du er stor fan av arbeidet deres – se hva som skjer 🌟", cat: "sosial" },
+    ],
+    group: [
+      { text: "En i gjengen er berømt – resten er fans. Dere møtes 'tilfeldig' ute og spiller det ut i 3 min! 🌟", cat: "kaos", punish: "Den som bryter karakter først bærer tittelen 'Amatørskuespiller' resten av dagen 🎭" },
+      { text: "Alle lager en synkronisert dans til en tilfeldig sang. 5 minutter å øve. Film og post! 💃", cat: "kaos", punish: "Den med dårligst timing må be gjengen om tilgivelse på overdramatisk vis 😂" },
+      { text: "En person er 'ja-personen' – sier ja til alt de andre foreslår i 10 minutter! 😈", cat: "kaos", punish: "Nekter ja-personen, dobles varigheten – og alle bytter roller! 😂" },
+    ]
+  }
+};
+
+function getChallenge() {
+  const isGroup = S.players !== 1;
+  const isWild = (S.age !== '13-15') && (S.mood === 'Klar for galskap');
+  const isMed  = S.mood === 'Energisk' || S.mood === 'Lei og rastløs' || S.time === '1 time' || S.time === 'Hele kvelden' || S.time === '2+ timer';
+  let pool, level;
+  if (isWild)     { pool = isGroup ? DB.wild.group   : DB.wild.solo;   level = 'wild'; }
+  else if (isMed) { pool = isGroup ? DB.medium.group : DB.medium.solo; level = 'medium'; }
+  else            { pool = isGroup ? DB.easy.group   : DB.easy.solo;   level = 'easy'; }
+  return { ...pool[Math.floor(Math.random() * pool.length)], level };
+}
+
+function pick(btn, key, val, cls) {
+  const map = { m: 'on', t: 'on-y', p: 'on-c' };
+  btn.closest('.grid2,.grid3,.grid4').querySelectorAll('.sel-btn').forEach(b => b.classList.remove('on','on-y','on-c'));
+  btn.classList.add(map[cls]);
+  S[key] = val;
+}
+
+function pickAge(btn, val) {
+  btn.closest('.age-row').querySelectorAll('.age-opt').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  S.age = val;
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function start() {
+  if (!S.mood || !S.time || !S.players) {
+    const h = document.getElementById('hint');
+    h.style.display = 'block';
+    setTimeout(() => h.style.display = 'none', 2800);
+    return;
+  }
+  show('s-load');
+  setTimeout(renderChallenge, 800);
+}
+
+function nextChallenge() {
+  show('s-load');
+  setTimeout(renderChallenge, 700);
+}
+
+function renderChallenge() {
+  const c = getChallenge();
+  S.challenge = c.text;
+  S.punishment = c.punish || null;
+
+  const badge = document.getElementById('c-badge');
+  const configs = { easy: ['🟢 Lett','b-easy'], medium: ['🟡 Medium','b-med'], wild: ['🔴 Kaos!','b-wild'] };
+  const [label, cls] = configs[c.level];
+  badge.textContent = label;
+  badge.className = 'c-badge ' + cls;
+
+  document.getElementById('c-text').textContent = c.text;
+  document.getElementById('c-tags').innerHTML =
+    `<span class="c-tag">🎯 ${c.cat}</span><span class="c-tag">⏱ ${S.time}</span><span class="c-tag">👥 ${S.players === 1 ? 'Solo' : S.players + ' pers.'}</span>`;
+
+  const pc = document.getElementById('punish-card');
+  if (c.punish && S.players !== 1) {
+    document.getElementById('punish-text').textContent = c.punish;
+    pc.style.display = 'block';
+  } else { pc.style.display = 'none'; }
+
+  document.getElementById('btn-invite').style.display = S.players !== 1 ? 'block' : 'none';
+  show('s-challenge');
+  confetti();
+}
+
+function goInvite() {
+  S.code = 'NÅ-' + Math.random().toString(36).substring(2,5).toUpperCase();
+  document.getElementById('inv-code').textContent = S.code;
+  show('s-invite');
+}
+
+function getShareText(withChallenge) {
+  if (!S.code) S.code = 'NÅ-' + Math.random().toString(36).substring(2,5).toUpperCase();
+  if (withChallenge)
+    return `🔥 NÅ-utfordring!\n\n"${S.challenge}"\n\nBruk kode ${S.code} i NÅ-appen – tør du? 😏`;
+  return `👯 Jeg utfordrer deg på NÅ-appen!\n\nKode: ${S.code}\n\nSame utfordring – taperen får straffen! 😈`;
+}
+
+function snapShare() { openShareOverlay(); }
+function snapInvite() { openShareOverlay(); }
+
+function openShareOverlay() {
+  if (!S.code) S.code = 'NÅ-' + Math.random().toString(36).substring(2,5).toUpperCase();
+  // Sync badge
+  const badge = document.getElementById('c-badge');
+  document.getElementById('share-badge').className = 'share-badge ' + (badge ? badge.className.replace('c-badge ','') : 'b-easy');
+  document.getElementById('share-badge').textContent = badge ? badge.textContent : '🟢 Lett';
+  document.getElementById('share-challenge').textContent = S.challenge || '–';
+  document.getElementById('share-code-val').textContent = S.code;
+  document.getElementById('share-overlay').classList.add('show');
+}
+
+function closeShare() {
+  document.getElementById('share-overlay').classList.remove('show');
+}
+
+function doSnapShare() {
+  const text = getShareText(true);
+  navigator.clipboard.writeText(text).catch(() => {});
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    toast('Tekst kopiert! Snapchat åpnes 👻');
+    setTimeout(() => { window.location.href = 'snapchat://'; }, 500);
+  } else {
+    toast('Kopiert! Åpne Snapchat på mobilen og lim inn 👻');
+  }
+}
+
+function copyShareText() {
+  const text = getShareText(true);
+  navigator.clipboard.writeText(text).then(() => toast('Kopiert! 📋')).catch(() => toast('Prøv igjen 🤔'));
+}
+
+function copyChallenge() {
+  navigator.clipboard.writeText(getShareText(true)).then(() => toast('Kopiert! 📋'));
+}
+
+function copyInvite() {
+  navigator.clipboard.writeText(getShareText(false)).then(() => toast('Invitasjon kopiert! 🚀'));
+}
+
+function joinCode() {
+  const val = document.getElementById('join-input').value.trim().toUpperCase();
+  if (val.length >= 5) { toast('Funnet! Gjør utfordringen! 💪'); confetti(); }
+  else toast('Sjekk koden og prøv igjen 🤔');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function confetti() {
+  const c = document.getElementById('cf');
+  c.innerHTML = '';
+  const cols = ['#ff3c6e','#ffe600','#00e0ff','#ff6535','#a855f7','#22c55e'];
+  for (let i = 0; i < 50; i++) {
+    const p = document.createElement('div');
+    p.className = 'cp';
+    const s = 6 + Math.random() * 7;
+    p.style.cssText = `left:${Math.random()*100}%;width:${s}px;height:${s}px;background:${cols[Math.floor(Math.random()*cols.length)]};border-radius:${Math.random()>.5?'50%':'3px'};animation-delay:${Math.random()*0.4}s;animation-duration:${1.8+Math.random()*0.8}s;`;
+    c.appendChild(p);
+  }
+  setTimeout(() => c.innerHTML = '', 3200);
+}
+</script>
+</body>
+</html>
