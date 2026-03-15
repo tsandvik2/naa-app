@@ -1010,6 +1010,14 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
   <div class="cam-rec" id="cam-rec" style="display:none">
     <span class="cam-rec-dot"></span> REC <span id="cam-rec-time">0:00</span>
   </div>
+  <!-- Utfordring popup — vises alltid når kamera åpnes -->
+  <div id="cam-challenge-popup" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.88);border:1.5px solid rgba(255,45,85,.4);border-radius:20px;padding:20px;text-align:center;z-index:20;display:none;max-width:280px;backdrop-filter:blur(10px);">
+    <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#ff2d55;margin-bottom:8px;">DIN UTFORDRING</div>
+    <div id="cam-popup-text" style="font-size:15px;font-weight:700;color:#fff;line-height:1.5;margin-bottom:16px;">–</div>
+    <button onclick="document.getElementById('cam-challenge-popup').style.display='none';" style="width:100%;padding:13px;background:#ff2d55;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;">Klar! Start filming 🎬</button>
+    <button onclick="closeCamera();" style="width:100%;padding:10px;background:transparent;color:rgba(255,255,255,.4);border:none;font-size:13px;cursor:pointer;margin-top:4px;">← Tilbake</button>
+  </div>
+
   <!-- Filming hint — vises kun første gang -->
   <div id="cam-hint" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);border-radius:16px;padding:16px 20px;text-align:center;z-index:20;display:none;max-width:260px;">
     <div style="font-size:28px;margin-bottom:8px;">🎬</div>
@@ -1333,14 +1341,14 @@ const DB={
       {text:"Ta bilde av noe som ser ut som et kjent emoji 😂",cat:"kreativ",cam:true},
     ],
     group:[
-      {text:"Alle lager et ansikt av maten sin – send bilde til gjengen. Stem på beste! 🍽️",cat:"kreativ",cam:true,p:"Taperen gjør en kylling-dans og filmer det 🐔"},
+      {text:"Alle lager et ansikt av maten sin – send bilde til gjengen. Stem på beste! 🍽️",cat:"kreativ",cam:true,p:"Taperen lager et nytt ansikt med maten og holder det i 30 sek 😂"},
       {text:"Hvem holder rett ansikt lengst mens de andre lager grimaser? 😐",cat:"sosial",cam:true,p:"Taperen gjør sin beste kylling-dans foran alle 🐔"},
       {text:"Alle skriver en 4-linjes rap om personen til høyre og leser høyt 🎤",cat:"kreativ",p:"Dårligste rapper synger sin rap som voice memo til alle 🎵"},
       {text:"Hvem finner den rareste tingen i lommen sin? Alle viser frem! 👜",cat:"sosial",cam:true,p:"Den med kjedeligst gjenstand bærer den som halskjede i 30 min 😄"},
       {text:"Alle tegner hverandre – 60 sekunder per portrett. Vis frem og stem i gjengen! 🖼️",cat:"kreativ",cam:true,p:"Dårligste kunstner bruker bildet som profilbilde i 12 timer 😂"},
-      {text:"Alle poserer som en kjent statue i 30 sekunder – stem på best! 🗿",cat:"kreativ",cam:true,p:"Taperen er DJ resten av kvelden 🎵"},
+      {text:"Alle poserer som en kjent statue i 30 sekunder – stem på best! 🗿",cat:"kreativ",cam:true,p:"Taperen holder statuepose i 1 minutt ekstra 🗿"},
       {text:"Synkroniser et hopp og ta bilde akkurat idet alle er i luften 🦘",cat:"fysisk",cam:true,p:"Den som ikke hopper høyt nok gjør 10 squats 🏋️"},
-      {text:"Alle lager verdens beste grimase – stem på hvem som vinner! 😜",cat:"sosial",cam:true,p:"Den med kjedeligst grimase gjør en kylling-dans 🐔"},
+      {text:"Alle lager verdens beste grimase – stem på hvem som vinner! 😜",cat:"sosial",cam:true,p:"Den med kjedeligst grimase holder den i 1 minutt på kamera 😂"},
       {text:"Alle skriver ned en morsom fakta om seg selv på papir, blander og leser opp 🤫",cat:"sosial",p:"Alle gjetter hvem som eier hvilken fakta 🕵️"},
       {text:"Hvem kan balansere flest ting på hodet? Film det! 🎩",cat:"fysisk",cam:true,p:"Taperen bærer én ting på hodet i 10 minutter 😂"},
     ]
@@ -1378,7 +1386,7 @@ const DB={
       {text:"Send til den 7. i kontaktlisten: 'Du vet hva du har gjort.' Vent på svar 😂",cat:"sosial",p:"Den som ler først sender samme melding til to nye kontakter 💀"},
       {text:"Alle bytter telefon i 3 minutter og sender én melding til tilfeldig kontakt 📱",cat:"kaos",p:"Den som sender noe kjedelig velger neste utfordring 🎯"},
       {text:"Overbevis gjengen om at en tilfeldig gjenstand er det kuleste som finnes – stem! 💼",cat:"kreativ",cam:true,p:"Dårligste selger bruker objektet som hatt hele kvelden 🎩"},
-      {text:"Alle finner et objekt ute og lager en felles skulptur av det 🌿",cat:"kreativ",cam:true,p:"Den som bidrar minst gjør kylling-dansen sin på kamera 🐔"},
+      {text:"Alle finner et objekt ute og lager en felles skulptur av det 🌿",cat:"kreativ",cam:true,p:"Den som bidrar minst navngir skulpturen og forsvarer den med full alvor 🌿"},
       {text:"Alle springer til et mål 50 meter unna – siste er taper 🏃",cat:"fysisk",p:"Taperen gjør 20 jumping jacks foran alle 😅"},
       {text:"Lag en menneskepyramide og ta bilde – holder dere i 5 sekunder? 🏋️",cat:"fysisk",cam:true,p:"Pyramiden må holdes dobbelt så lenge neste forsøk 💪"},
       {text:"Alle finner en pinne ute og lager et kunstverk i bakken 🌾",cat:"kreativ",cam:true,p:"Dårligste kunstverk bæres som hatt i 10 minutter 🎨"},
@@ -1412,9 +1420,9 @@ const DB={
       {text:"Alle bytter personlighet med personen til høyre i 15 minutter. Inn i karakter NÅ! 🎭",cat:"kaos",cam:true,p:"Den som bryter karakter synger teksten til neste ting noen sier 🎤"},
       {text:"Gjengen deler seg i to og improviserer en telenovela-scene på 3 minutter 🎬",cat:"kaos",cam:true,p:"Dårligste skuespiller synger avslutningssangen alene 🎵"},
       {text:"En er guide, resten er turister – gå gjennom nabolaget og presenter alt overdramatisk 🗺️",cat:"kaos",cam:true,p:"Dårligste turist bærer en imaginær koffert resten av turen 🧳"},
-      {text:"Alle bytter sko med hverandre og går til nærmeste lykt og tilbake 👟",cat:"kaos",cam:true,p:"Den som nekter må gjøre 10 hønemiminger på kamera 🐔"},
+      {text:"Alle bytter sko med hverandre og går til nærmeste lykt og tilbake 👟",cat:"kaos",cam:true,p:"Den som nekter bærer alle de andres sko i 5 minutter 👟"},
       {text:"Gjengen bestemmer et hemmelig ord – den som sier det mister et poeng i 20 min 🤫",cat:"kaos",p:"Den med flest poeng bestemmer neste destinasjon 📍"},
-      {text:"Flash mob! Alle fryser på signal i et offentlig rom i 30 sekunder 🧊",cat:"kaos",cam:true,p:"Den som beveger seg gjør kylling-imitasjon i 10 sek 🐔"},
+      {text:"Flash mob! Alle fryser på signal i et offentlig rom i 30 sekunder 🧊",cat:"kaos",cam:true,p:"Den som beveger seg må fryse dobbelt så lenge neste runde ❄️"},
       {text:"Gjengen lager en spontan fotoutstilling – finn fem kunstverk ute og presenter dem 🖼️",cat:"kreativ",cam:true,p:"Dårligste kurator forklarer alle verkene med kun lyder 😂"},
       {text:"Alle velger et dyr å være – hold karakteren gjennom neste aktivitet 🦁",cat:"kaos",p:"Den som bryter karakteren raskest gjør tre triks som hund 🐕"},
     ]
@@ -1432,8 +1440,8 @@ const DB={
     ],
     group:[
       {text:"Alle lager det morsomste ansiktet de kan – stem i gjengen! 😜",cat:"sosial",cam:true,p:"Kjedeligste ansikt gjør en kylling-dans 🐔"},
-      {text:"Lag en synkronisert dans på 30 sekunder – film det! 💃",cat:"kreativ",cam:true,p:"Den med dårligst timing gjør seg til i 30 sek på kamera 😂"},
-      {text:"Alle poserer som berømte statuer – hvem er best? 🗿",cat:"kreativ",cam:true,p:"Taperen er DJ resten av kvelden 🎵"},
+      {text:"Lag en synkronisert dans på 30 sekunder – film det! 💃",cat:"kreativ",cam:true,p:"Den med dårligst timing danse solo samme sang én gang til 💃"},
+      {text:"Alle poserer som berømte statuer – hvem er best? 🗿",cat:"kreativ",cam:true,p:"Taperen holder statuepose i 30 sek og smiler ikke 🗿"},
       {text:"Lag en menneskekjede og gå ti skritt uten å miste grepet 🤝",cat:"fysisk",p:"Den som slipper gjør 5 starhopp mens de synger 🌟"},
       {text:"Alle skriker favorittlåten sin samtidig i 10 sekunder 🎤",cat:"sosial",cam:true,p:"Den med lavest volum synger alene etterpå 🎵"},
     ]
@@ -2490,13 +2498,18 @@ function sendToApp(txt,platform){
 async function openCamera(){
   const overlay=document.getElementById('cam-overlay');
   overlay.classList.add('on');
-  // Vis hint første gang
-  if(!localStorage.getItem('na_cam_hint')){
-    setTimeout(()=>{document.getElementById('cam-hint').style.display='block';},800);
-  }
   document.getElementById('cam-filter-challenge').textContent=S.challenge||'NÅ-utfordring';
   document.getElementById('cam-filter-user').textContent='@'+PL.name+' • 🔥'+PL.streak+' streak';
   setCamMode(S.needsCamera?'video':'photo');
+  // Vis utfordring-popup alltid
+  if(S.challenge){
+    const popup=document.getElementById('cam-challenge-popup');
+    document.getElementById('cam-popup-text').textContent=S.challenge;
+    popup.style.display='block';
+  } else if(!localStorage.getItem('na_cam_hint')){
+    // Vis hint første gang hvis ingen utfordring
+    setTimeout(()=>{document.getElementById('cam-hint').style.display='block';},800);
+  }
   await startCamStream();
 }
 
