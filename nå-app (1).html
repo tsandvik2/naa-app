@@ -883,7 +883,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
           <div class="my-code-label">👤 Din vennekode</div>
           <div class="my-code-sub">Del denne så venner kan legge deg til</div>
         </div>
-        <div class="my-code-val" id="my-code-val">NÅ-???</div>
+        <div class="my-code-val" id="my-code-val" onclick="copyMyCode()" style="cursor:pointer;" title="Trykk for å kopiere">NÅ-???</div>
       </div>
       <div style="display:flex;gap:8px;margin-top:12px">
         <button class="btn btn-snap" style="flex:1;padding:13px;font-size:14px" onclick="shareMyCode('snap')">👻 Send på Snap</button>
@@ -909,7 +909,13 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
       <div class="friends-empty">
         <div style="font-size:48px;margin-bottom:12px">👻</div>
         <div style="font-size:16px;font-weight:800;margin-bottom:6px">Ingen venner ennå</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.5">Del koden din på Snapchat<br>og legg dem til her!</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6">
+          <strong style="color:#fff">Slik legger du til venner:</strong><br><br>
+          1️⃣ Trykk <strong style="color:#ff2d55">Send på Snap</strong> øverst<br>
+          2️⃣ Send meldingen til vennen<br>
+          3️⃣ De åpner lenken → godtar<br>
+          4️⃣ Dere er venner! 🎉
+        </div>
       </div>
     </div>
     <div id="friends-list"></div>
@@ -2987,7 +2993,7 @@ async function addFriend(){
   hint.className='add-friend-hint ok';
   hint.textContent=(newFriend.real?'✅ '+newFriend.name+' funnet og lagt til! 🎉':'✅ '+newFriend.name+' lagt til!');
   setTimeout(()=>{hint.textContent='';hint.className='add-friend-hint';},3000);
-  playSound('complete');confetti();
+  playSound('complete');avatarDrop();
   renderFriends();
   // Send vennskap til Supabase — begge ser hverandre
   if(newFriend.real) sbSendFriendRequest(val);
@@ -3069,19 +3075,15 @@ function copyMyCode(){
 
 function shareMyCode(platform){
   const code=getMyCode();
-  const txt=`👋 Legg meg til som venn i NÅ-appen!\n\nKoden min: ${code}\n\nÅpne: tsandvik2.github.io/naa-app2\n\n#NåAppen`;
+  // Lenken legger deg automatisk til som venn når de åpner den
+  const link='https://tsandvik2.github.io/naa-app2?f='+encodeURIComponent(code);
+  const txt='👋 Bli venn med meg på NÅ-appen!\n\n'+PL.name+' vil legge deg til som venn 🔥\n\nTrykk her — så legges vi til automatisk:\n'+link+'\n\n#NåAppen';
   sendToApp(txt,platform);
 }
 
 // ── Add demo friends for new users so it doesn't look empty ──
 function addDemoFriendsIfEmpty(){
-  if(!PL.friends||PL.friends.length===0){
-    PL.friends=[
-      {name:'Marcus',emoji:'😎',code:'NÅ-MAR847',pts:47,streak:5,addedDate:'demo'},
-      {name:'Sara',emoji:'😈',code:'NÅ-SAR312',pts:31,streak:2,addedDate:'demo'},
-    ];
-    saveData();
-  }
+  // Demo-venner fjernet — kun ekte venner vises
 }
 
 
@@ -3130,29 +3132,36 @@ if(PL.name&&PL.name!==''){
   const pending=PL.pending||[];
   if(pending.length>0){const nb=document.getElementById('nav-badge');if(nb){nb.style.display='flex';nb.textContent=pending.length;}}
 
-  // Handle friend invite via URL: ?c=NÅ-ABC&f=NÅ-XYZ
+  // Handle URL params: ?c=utfordring &f=vennekode
   const urlParams=new URLSearchParams(window.location.search);
   const inviteCode=urlParams.get('c');
   const friendCode=urlParams.get('f');
+
+  async function handleFriendFromURL(fCode){
+    if(!fCode||fCode===getMyCode())return;
+    const profile=await sbLookupFriend(fCode);
+    if(profile){
+      if(!PL.friends)PL.friends=[];
+      const exists=PL.friends.some(f=>f.code===fCode);
+      if(!exists) showFriendRequestPopup(profile,fCode);
+    }
+  }
+
+  // Kun vennelenke uten utfordring
+  if(friendCode&&!inviteCode){
+    setTimeout(()=>handleFriendFromURL(friendCode),1500);
+    window.history.replaceState({},'',window.location.pathname);
+  }
+
+  // Utfordringslenke (med eller uten vennekode)
   if(inviteCode){
     toast('👯 Venn har utfordret deg! Henter utfordring...');
     setTimeout(async()=>{
-      // Vis godta/avslå popup hvis f= finnes
-      if(friendCode&&friendCode!==getMyCode()){
-        const profile=await sbLookupFriend(friendCode);
-        if(profile){
-          if(!PL.friends)PL.friends=[];
-          const exists=PL.friends.some(f=>f.code===friendCode);
-          if(!exists){
-            showFriendRequestPopup(profile, friendCode);
-          }
-        }
-      }
+      if(friendCode)await handleFriendFromURL(friendCode);
       S.mood='Klar for galskap';S.time='30 min';S.players=1;
       const c=await joinCode(inviteCode);
       if(c)showChallenge(c);
       else{const ch=getChallenge();showChallenge(ch);}
-      // Clean URL
       window.history.replaceState({},'',window.location.pathname);
     },1200);
   }
