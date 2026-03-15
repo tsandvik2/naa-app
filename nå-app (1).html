@@ -1051,7 +1051,8 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
   </div>
   <div class="cam-preview-actions">
     <div class="cam-preview-title">Bra! Del det nå 🔥</div>
-    <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;">Trykk på en app → bildet lagres → du kan lime det inn</div>
+    <div id="share-photo-hint" style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;">Trykk en knapp for å dele direkte 📲</div>
+    <script>if(/iPhone|iPad/.test(navigator.userAgent))document.getElementById('share-photo-hint').textContent='Trykk en knapp → iOS deleark åpnes 📲';</script>
     <button class="btn btn-snap" onclick="sharePhoto('snap')">👻 Del på Snapchat</button>
     <button class="btn btn-insta" onclick="sharePhoto('insta')">📸 Del på Instagram</button>
     <button class="btn btn-tiktok" onclick="sharePhoto('tiktok')">🎵 Del på TikTok</button>
@@ -2530,10 +2531,78 @@ function camShutterPress(){
 function startRecording(){
   if(!camStream)return;
   recordedChunks=[];
-  const opts=typeof MediaRecorder!=='undefined'&&MediaRecorder.isTypeSupported('video/webm')
-    ?{mimeType:'video/webm'}:{};
+
+  // Tegn video + filter på canvas i sanntid
+  const video=document.getElementById('cam-video');
+  const canvas=document.getElementById('cam-canvas');
+  canvas.style.display='none'; // skjult men aktiv
+  canvas.width=video.videoWidth||1280;
+  canvas.height=video.videoHeight||720;
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width, h=canvas.height;
+
+  function drawFilterFrame(){
+    if(!mediaRecorder||mediaRecorder.state!=='recording')return;
+    // Tegn video
+    if(facingMode==='user'){ctx.translate(w,0);ctx.scale(-1,1);}
+    ctx.drawImage(video,0,0,w,h);
+    if(facingMode==='user'){ctx.setTransform(1,0,0,1,0,0);}
+    // Gradienter
+    const topG=ctx.createLinearGradient(0,0,0,h*0.25);
+    topG.addColorStop(0,'rgba(0,0,0,0.72)');topG.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=topG;ctx.fillRect(0,0,w,h*0.25);
+    const botG=ctx.createLinearGradient(0,h*0.55,0,h);
+    botG.addColorStop(0,'rgba(0,0,0,0)');botG.addColorStop(1,'rgba(0,0,0,0.88)');
+    ctx.fillStyle=botG;ctx.fillRect(0,h*0.55,w,h*0.45);
+    // NÅ logo
+    ctx.font=`bold ${w*0.09}px Arial Black,sans-serif`;
+    ctx.fillStyle='#ff2d55';ctx.fillText('NÅ',w*0.06,w*0.1);
+    // Tag
+    ctx.fillStyle='rgba(255,45,85,0.75)';
+    ctx.beginPath();ctx.roundRect(w*0.22,w*0.048,w*0.42,w*0.068,w*0.02);ctx.fill();
+    ctx.font=`bold ${w*0.033}px Arial`;ctx.fillStyle='#fff';
+    ctx.fillText('🔥 NÅ-utfordring',w*0.235,w*0.09);
+    // REC indikator
+    ctx.fillStyle='rgba(255,45,85,0.85)';
+    ctx.beginPath();ctx.arc(w*0.88,h*0.06,w*0.012,0,Math.PI*2);ctx.fill();
+    ctx.font=`bold ${w*0.032}px Arial`;ctx.fillStyle='#fff';
+    ctx.fillText('REC',w*0.9,h*0.065);
+    // Utfordring tekst
+    const chalText=S.challenge||'NÅ-utfordring';
+    ctx.font=`bold ${w*0.038}px Arial`;ctx.fillStyle='#fff';
+    wrapTextMaxLines(ctx,chalText,w*0.06,h*0.68,w*0.88,w*0.046,3);
+    // Bruker
+    ctx.font=`${w*0.03}px Arial`;ctx.fillStyle='rgba(255,255,255,0.7)';
+    ctx.fillText('@'+PL.name+' • 🔥'+PL.streak+' streak',w*0.06,h*0.88);
+    // Hashtags
+    ctx.font=`${w*0.025}px Arial`;ctx.fillStyle='rgba(255,255,255,0.45)';
+    ctx.fillText('#NåUtfordringen #NåEllerAldri',w*0.06,h*0.94);
+    requestAnimationFrame(drawFilterFrame);
+  }
+
+  // Start canvas stream
+  const canvasStream=canvas.captureStream(30);
+  const mimeType=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':
+                 MediaRecorder.isTypeSupported('video/webm')?'video/webm':'';
   try{
-    mediaRecorder=new MediaRecorder(camStream,opts);
+    mediaRecorder=new MediaRecorder(canvasStream,mimeType?{mimeType}:{});
+    mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size>0)recordedChunks.push(e.data);};
+    mediaRecorder.onstop=onRecordingStop;
+    mediaRecorder.start(100);
+    drawFilterFrame(); // Start tegning
+    document.getElementById('cam-rec').style.display='flex';
+    document.getElementById('cam-shutter').classList.add('recording');
+    recSeconds=0;
+    recInterval=setInterval(()=>{
+      recSeconds++;
+      const m=Math.floor(recSeconds/60),s=recSeconds%60;
+      document.getElementById('cam-rec-time').textContent=m+':'+(s<10?'0':'')+s;
+      if(recSeconds>=60)stopRecording();
+    },1000);
+  }catch(e){
+    console.warn('Canvas stream feilet, bruker rå kamera:',e);
+    // Fallback til rå kamera
+    mediaRecorder=new MediaRecorder(camStream,{});
     mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size>0)recordedChunks.push(e.data);};
     mediaRecorder.onstop=onRecordingStop;
     mediaRecorder.start(100);
@@ -2546,7 +2615,7 @@ function startRecording(){
       document.getElementById('cam-rec-time').textContent=m+':'+(s<10?'0':'')+s;
       if(recSeconds>=60)stopRecording();
     },1000);
-  }catch(e){toast('Video støttes ikke i denne nettleseren 😬');}
+  }
 }
 
 function stopRecording(){
@@ -2713,41 +2782,76 @@ function retakeVideo(){
   openCamera();
 }
 
-function shareVideo(platform){
+async function shareVideo(platform){
   if(!videoBlob){toast('Ingen video å dele 🤔');return;}
+  const mob=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  // Prøv Web Share API med video
+  if(mob&&navigator.share&&navigator.canShare){
+    const ext=videoBlob.type.includes('mp4')?'mp4':'webm';
+    const file=new File([videoBlob],'nå-utfordring.'+ext,{type:videoBlob.type});
+    if(navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({files:[file],title:'NÅ-utfordring',text:'🔥 '+(S.challenge||'')+'
+
+#NåUtfordringen'});
+        toast('Delt! 🔥');return;
+      }catch(e){if(e.name==='AbortError')return;}
+    }
+  }
+  // Fallback: last ned
   try{
     const url=URL.createObjectURL(videoBlob);
     const a=document.createElement('a');
     a.href=url;a.download='nå-utfordring.mp4';a.click();
-    setTimeout(()=>{
-      const urls={snap:'snapchat://',insta:'instagram://story-camera',tiktok:'tiktok://'};
-      window.location.href=urls[platform]||urls.snap;
-    },800);
-    toast('Video lagret! Åpner '+platform+'... 📲');
-  }catch(e){
-    const txt=`🔥 Fullførte NÅ-utfordringen!\n\n"${S.challenge}"\n\ntsandvik2.github.io/naa-app2\n\n#NåAppen`;
-    sendToApp(txt,platform);
-  }
+    URL.revokeObjectURL(url);
+    if(mob){
+      const urls={tiktok:'tiktok://',insta:'instagram://story-camera',snap:'snapchat://'};
+      setTimeout(()=>{window.location.href=urls[platform]||urls.tiktok;},1000);
+      toast('Video lagret! Åpner appen... 🎵');
+    }else{toast('Video lastet ned! 🎬');}
+  }catch(e){toast('Noe gikk galt 😬');}
 }
-
 function sharePhoto(platform){
   const canvas=document.getElementById('cam-canvas');
-  // Try to save image and open app
+  const mob=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   try{
-    canvas.toBlob(blob=>{
+    canvas.toBlob(async blob=>{
+      // Prøv Web Share API først (fungerer på iPhone Safari)
+      if(mob && navigator.share && navigator.canShare){
+        const file=new File([blob],'nå-utfordring.jpg',{type:'image/jpeg'});
+        if(navigator.canShare({files:[file]})){
+          try{
+            await navigator.share({
+              files:[file],
+              title:'NÅ-utfordring',
+              text:'🔥 '+S.challenge+'
+
+#NåUtfordringen'
+            });
+            toast('Delt! 🔥');
+            return;
+          }catch(e){
+            if(e.name!=='AbortError') console.warn('Share feilet:',e);
+          }
+        }
+      }
+      // Fallback: last ned og åpne app
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');
       a.href=url;a.download='nå-utfordring.jpg';a.click();
       URL.revokeObjectURL(url);
-      setTimeout(()=>{
-        const urls={snap:'snapchat://',insta:'instagram://story-camera',tiktok:'tiktok://'};
-        window.location.href=urls[platform]||urls.snap;
-      },800);
-      toast('Bilde lagret! Åpner appen... 📲');
+      if(mob){
+        setTimeout(()=>{
+          const urls={snap:'snapchat://',insta:'instagram://story-camera',tiktok:'tiktok://'};
+          window.location.href=urls[platform]||urls.snap;
+        },1000);
+        toast('Lagret! Åpner '+platform+'... 📲');
+      } else {
+        toast('Bilde lastet ned! 📸');
+      }
     },'image/jpeg',0.92);
   }catch(e){
-    const txt=`🔥 Fullførte NÅ-utfordringen!\n\n"${S.challenge}"\n\ntsandvik2.github.io/naa-app2\n\n#NåAppen`;
-    sendToApp(txt,platform);
+    toast('Bruk iOS: trykk og hold på bildet → Lagre 💡');
   }
 }
 
