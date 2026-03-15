@@ -1009,6 +1009,13 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
   <div class="cam-rec" id="cam-rec" style="display:none">
     <span class="cam-rec-dot"></span> REC <span id="cam-rec-time">0:00</span>
   </div>
+  <!-- Filming hint — vises kun første gang -->
+  <div id="cam-hint" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);border-radius:16px;padding:16px 20px;text-align:center;z-index:20;display:none;max-width:260px;">
+    <div style="font-size:28px;margin-bottom:8px;">🎬</div>
+    <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:6px;">Slik filmer du</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.5;margin-bottom:12px;">Film deg selv mens du gjør utfordringen. Trykk på den store knappen for å ta bilde eller start video!</div>
+    <button onclick="document.getElementById('cam-hint').style.display='none';localStorage.setItem('na_cam_hint','1');" style="width:100%;padding:11px;background:#ff2d55;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">Skjønte det! 🔥</button>
+  </div>
   <div class="cam-controls">
     <button class="cam-close" onclick="closeCamera()">✕</button>
     <button class="cam-shutter" id="cam-shutter" onclick="camShutterPress()"></button>
@@ -1031,7 +1038,8 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
     </div>
   </div>
   <div class="cam-preview-actions">
-    <div class="cam-preview-title">Del bildet 🔥</div>
+    <div class="cam-preview-title">Bra! Del det nå 🔥</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;">Trykk på en app → bildet lagres → du kan lime det inn</div>
     <button class="btn btn-snap" onclick="sharePhoto('snap')">👻 Del på Snapchat</button>
     <button class="btn btn-insta" onclick="sharePhoto('insta')">📸 Del på Instagram</button>
     <button class="btn btn-tiktok" onclick="sharePhoto('tiktok')">🎵 Del på TikTok</button>
@@ -1054,7 +1062,8 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
     </div>
   </div>
   <div class="cam-preview-actions">
-    <div class="cam-preview-title">Del videoen 🔥</div>
+    <div class="cam-preview-title">Bra! Del videoen nå 🔥</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;">Trykk på en app → videoen lagres → åpnes der du kan poste</div>
     <button class="btn btn-tiktok" onclick="shareVideo('tiktok')">🎵 Del på TikTok</button>
     <button class="btn btn-insta" onclick="shareVideo('insta')">📸 Del på Reels</button>
     <button class="btn btn-snap" onclick="shareVideo('snap')">👻 Del på Snapchat</button>
@@ -1446,9 +1455,9 @@ const DB={
       {text:"Alle lip syncer til samme sang – men ingen vet hvilken sang som kommer. Én holder telefonen skjult og trykker play 🎤",cat:"video",cam:true,p:"Den med minst bevegelse synger den ordentlig etterpå 😂"},
     ],
     solo:[
-      {text:"Sett på shuffle, trykk play – dans som om du VISSTE hvilken sang som kom. Full innsats fra første sekund, ikke stopp uansett! 🎵",cat:"video",cam:true},
+      {text:"Trykk shuffle og dans som om du VISSTE hvilken sang som kom. Stopp ALDRI! 🎵",cat:"video",cam:true},
       {text:"Film ansiktet ditt mens du åpner den seneste meldingen fra mamma og les den høyt med dramatisk stemme 📱",cat:"video",cam:true},
-      {text:"Hold kamera på ansiktet – velg en tilfeldig følelse og lag en 15-sekunders monolog om ingenting med den følelsen på MAKS 🎭",cat:"video",cam:true},
+      {text:"Kamera på ansiktet – velg en tilfeldig følelse og snakk om ingenting i 15 sek. MAKS intensitet! 🎭",cat:"video",cam:true},
       {text:"Les den mest absurde nyheten du finner — alvorlig nyhetsoppleserstemme, ingen smiling 📰",cat:"video",cam:true},
       {text:"Si Norsk er et morsomt språk på 5 forskjellige aksenter — ingen smiling 🌍",cat:"video",cam:true},
       {text:"Lær en TikTok-dans på 3 min og film hele prosessen — post det uferdig! 💃",cat:"video",cam:true},
@@ -1461,25 +1470,25 @@ const DB={
       {text:"Ta på deg den rareste kombinasjonen av klær du finner og film en 'outfit of the day' med full selvtillit 👗",cat:"video",cam:true},
       {text:"Film ansiktet ditt tett mens en venn velger en sang du hater og spiller den. Hold rett ansikt i 30 sekunder 😐",cat:"video",cam:true},
       {text:"Lag en 'morning routine' video av de neste 2 minuttene – uansett hva du gjør. Gjør det episk 🌅",cat:"video",cam:true},
-      {text:"Random dance! En venn roper en tilfeldig sang – du har 1 sekund på å begynne å danse. Ingen pause, ingen nøling. Kamera ruller! 🎵",cat:"video",cam:true},
-      {text:"Lip sync battle: velg den mest dramatiske sangen du finner og lip sync den med FULL kropp – ansikt, armer, alt. 60 sekunder 🎤",cat:"video",cam:true},
-      {text:"Bytt aksent hvert 10. sekund mens du forteller om dagen din. Norsk, britisk, amerikansk, fransk. Kamera på ansiktet hele tiden 🌍",cat:"video",cam:true},
-      {text:"'Get ready with me' – film deg selv de neste 90 sekundene akkurat som du er. Kommenter HVERT steg som om det er glamourøst 💅",cat:"video",cam:true},
+      {text:"Random dance! Noen roper en sang – du har 1 sekund på å begynne å danse. Ingen nøling! 🎵",cat:"video",cam:true},
+      {text:"Lip sync battle! Velg den villeste sangen og gå ALL IN – ansikt, armer, kropp. 60 sek! 🎤",cat:"video",cam:true},
+      {text:"Bytt aksent hvert 10. sek mens du forteller om dagen. Norsk → britisk → amerikansk → fransk 🌍",cat:"video",cam:true},
+      {text:"Film deg selv de neste 90 sek – kommenter ALT du gjør som om det er superglamorøst 💅",cat:"video",cam:true},
       {text:"Imiter lyden av 5 forskjellige dyr på rad mens du holder helt rett ansikt. Kamera tett på. Ingen smiling tillatt 🐄",cat:"video",cam:true},
     ],
     group:[
       {text:"To personer stirrer på hverandre rett i kamera. Den som smiler, blunker eller beveger seg TAPER. Film ansiktene tett 😐",cat:"video",cam:true,p:"Taperen gjør kylling-dans på kamera og poster det 🐔"},
       {text:"Noen roper et tilfeldig yrke — du har 3 sek på å gå INN i karakteren i 30 sek 🎭",cat:"video",cam:true,p:"Den som bryter karakteren gjør det om igjen som et dyr 🐾"},
       {text:"Speillek! A gjør bevegelser — B MÅ kopiere umiddelbart. Film begge. Bytt etter 30 sek 🔄",cat:"video",cam:true,p:"Den som henger etter bytter og må kopiere dobbelt så fort 😂"},
-      {text:"Alle fryser på signal midt i det dere gjør – hold posisjonen i 20 sekunder mens kamera går sakte rundt og filmer alle ❄️",cat:"video",cam:true,p:"Den som beveger seg velger neste utfordring og MÅ filme den"},
-      {text:"Film ansiktet til en venn mens du viser dem et bilde de ikke har sett. Ikke vis bildet – bare reaksjonen. La seerne gjette 👀",cat:"video",cam:true,p:"Den med kjedeligst reaksjon må se et enda verre bilde 😬"},
+      {text:"Frys på signal! Hold posisjonen i 20 sek mens kamera filmer alle. Ingen bevegelse! ❄️",cat:"video",cam:true,p:"Den som beveger seg velger neste utfordring og MÅ filme den"},
+      {text:"Vis en venn et bilde de IKKE har sett – film bare reaksjonen. Ikke vis bildet! La folk gjette 👀",cat:"video",cam:true,p:"Den med kjedeligst reaksjon må se et enda verre bilde 😬"},
       {text:"En er reporter, en er kjendis. Reporter stiller de villeste spørsmål mulig – kjendis må svare seriøst 🎤",cat:"video",cam:true,p:"Dårligste intervju-objekt svarer alle spørsmål på operastemme 🎤"},
       {text:"Alle velger en lydeffekt på telefonen – spill dem i tur og orden mens dere holder rett ansikt. First to laugh loses 🔊",cat:"video",cam:true,p:"Den som ler først må lage sin egen lydeffekt live 😂"},
       {text:"Én er regissør 🎬 Instrukser gjengen hvert 5. sek – de MÅ følge! Film det!",cat:"video",cam:true,p:"Dårligste skuespiller blir regissør neste gang"},
       {text:"Lag verdens raskeste makeover – 60 sekunder, det dere finner i nærheten. Film prosessen og resultatet 💄",cat:"video",cam:true,p:"Dårligste makeover beholder looken i 30 minutter 😂"},
 
       // ── VANN I MUNNEN ──
-      {text:"Alle har vann i munnen 💧 Én person leser høyt fra et tilfeldig Wikipedia-innlegg. Kamera på ansiktene – første som spruter taper!",cat:"video",cam:true,p:"Taperen har dobbelt vann neste runde 😂"},
+      {text:"Vann i munnen! 💧 Én leser fra Wikipedia. Kamera på ansiktene – første som spruter taper!",cat:"video",cam:true,p:"Taperen har dobbelt vann neste runde 😂"},
       {text:"Alle har vann i munnen 💧 Én person gjør sin beste hest-imitasjon. Ingen stopp før 30 sekunder er gått!",cat:"video",cam:true,p:"Taperen velger neste dyr som skal imiteres 🐴"},
       {text:"Alle har vann i munnen 💧 Én person prøver å fortelle en vits de finner på stedet. Kamera fanger ALLE reaksjoner!",cat:"video",cam:true,p:"Den som sprutet velger neste person som skal fortelle vits 😂"},
       {text:"Alle har vann i munnen 💧 Én spiller den rareste TikTok-lyden de finner på maks volum. Hold deg!",cat:"video",cam:true,p:"Taperen velger neste lyd og MÅ holde rett ansikt dobbelt så lenge 🔊"},
@@ -1489,27 +1498,27 @@ const DB={
 
       // ── EN GJØR NOE ABSURD, RESTEN PRØVER Å HOLDE SEG ──
       {text:"Én person velger et tilfeldig ord og bruker det i ALLE svar i 3 minutter uansett hva som blir sagt. Kamera på alle 🎭",cat:"video",cam:true,p:"Taperen bruker to ord resten av kvelden 😂"},
-      {text:"Én person forklarer hvordan man lager kaffe – men later som det er den farligste operasjonen i verden. Full alvor, kamera på resten 😰",cat:"video",cam:true,p:"Taperen forklarer neste hverdagsaktivitet med livsfare 😂"},
+      {text:"Forklar hvordan man lager kaffe – men lat som det er LIVSFARLIG. Full alvor. Film reaksjonene! 😰",cat:"video",cam:true,p:"Taperen forklarer neste hverdagsaktivitet med livsfare 😂"},
       {text:"Én person kommenterer det som skjer akkurat nå som sportskommentator på TV. Kamera på ansiktene til resten 🎙️",cat:"video",cam:true,p:"Taperen overtar kommentatorjobben i 2 minutter 🏆"},
-      {text:"Én person skal overbevise resten om at en tilfeldig gjenstand er det kuleste som finnes. Full reklame-energi. Kamera på reaksjonene 📺",cat:"video",cam:true,p:"Taperen overtar reklame-monologen for neste gjenstand 😂"},
+      {text:"Overbevise gjengen om at en tilfeldig gjenstand er det kuleste som finnes. Full reklame-energi! Film reaksjonene 📺",cat:"video",cam:true,p:"Taperen overtar reklame-monologen for neste gjenstand 😂"},
       {text:"Én person leser opp værmeldingen for i dag som om det er dommedagsprofeti. Kamera på resten – ingen latter tillatt ⛈️",cat:"video",cam:true,p:"Taperen framfører morgendagens værmelding på samme vis 🌪️"},
-      {text:"Én person intervjuer en tilfeldig gjenstand i rommet som om den er en kjendis. Resten holder rett ansikt. Kamera på alle 🎤",cat:"video",cam:true,p:"Taperen takker gjenstanden i en rørende tale 😂"},
+      {text:"Intervju en tilfeldig gjenstand som om den er en kjendis. Resten MÅ holde rett ansikt! 🎤",cat:"video",cam:true,p:"Taperen takker gjenstanden i en rørende tale 😂"},
       {text:"Én person forklarer reglene for et sport de ikke kan – med full selvtillit og masse feil. Resten holder rett ansikt ⚽",cat:"video",cam:true,p:"Taperen er dommer neste gang de faktisk spiller sporten 🏆"},
 
       // ── TO PERSONER, KAMERA MELLOM ──
-      {text:"To personer stirrer på hverandre rett i kamera. Ingen blunking, ingen smiling, ingen bevegelse. Første som gir seg TAPER 👁️",cat:"video",cam:true,p:"Taperen gjør kylling-dans på kamera og poster det 🐔"},
-      {text:"To personer sier det samme ordet frem og tilbake – men bytt tonefall hver gang. Trist, sint, forelsket, redd. Ingen latter! 🎭",cat:"video",cam:true,p:"Taperen sier ordet med 5 nye toneleier alene på kamera 😂"},
+      {text:"Stirrekonkurranse! Rett i kamera. Ingen blunking. Ingen smiling. Første som gir seg taper 👁️",cat:"video",cam:true,p:"Taperen gjør kylling-dans på kamera og poster det 🐔"},
+      {text:"Si samme ord frem og tilbake – men bytt tonefall hver gang. Trist → sint → forelsket → redd! 🎭",cat:"video",cam:true,p:"Taperen sier ordet med 5 nye toneleier alene på kamera 😂"},
       {text:"To personer forsøker å synge samme sang – men én synger 5 sekunder forsinket. Kamera fanger begge. Ikke stopp! 🎵",cat:"video",cam:true,p:"Taperen synger begge stemmene alene 🎤"},
       {text:"To personer har full krangel om noe helt ubetydelig – hvem som la igjen toalettpapiret tomt. FULL drama. Kamera ruller 🧻",cat:"video",cam:true,p:"Taperen av krangelen skaffer nytt toalettpapir til alle 😂"},
-      {text:"Flip the Switch! To personer bytter plass og kroppsspråk på signal – ALT av bevegelser og måten å snakke på. Kamera ruller hele tiden 🔄",cat:"video",cam:true,p:"Den som bytter dårligst beholder den andres stil i 10 min 😂"},
+      {text:"Flip the Switch! Bytt plass og kroppsspråk på signal. ALT byttes – film det! 🔄",cat:"video",cam:true,p:"Den som bytter dårligst beholder den andres stil i 10 min 😂"},
       {text:"Random dance challenge: én velger sang, alle andre har 2 sekunder på å begynne å danse. Ingen unntak, kamera på alle 🎵",cat:"video",cam:true,p:"Den med dårligst reaksjonstid danser alene til neste sang 💃"},
       {text:"Alle lip syncer til samme sang – men ingen vet hvilken sang som kommer. Én holder telefonen skjult og trykker play 🎤",cat:"video",cam:true,p:"Den med minst bevegelse synger den ordentlig etterpå 😂"},
-      {text:"Synkronisert dans challenge: dere har 3 minutter på å lage en synkronisert dans til en tilfeldig sang. Film og post resultatet! 💃",cat:"video",cam:true,p:"Den som er mest ute av synk velger neste sang 🎵"},
-      {text:"Blinking challenge: alle fixer blikket i kamera – ingen blunking tillatt. Kamera filmer alle ansiktene. Siste som blunker vinner 👁️",cat:"video",cam:true,p:"Taperen blunker 50 ganger med vilje på kamera som straff 😂"},
-      {text:"Én person velger en tilfeldig TikTok-lyd og spiller den – alle andre MÅ umiddelbart lage en dans til den. Ingen forberedelse 📱",cat:"video",cam:true,p:"Den med dårligste improvisasjon velger neste lyd 😂"},
+      {text:"3 minutter på å lage synkronisert dans til en tilfeldig sang. Film og post! 💃",cat:"video",cam:true,p:"Den som er mest ute av synk velger neste sang 🎵"},
+      {text:"Blinking challenge! Alle stirrer i kamera – ingen blunking. Siste som blunker vinner! 👁️",cat:"video",cam:true,p:"Taperen blunker 50 ganger med vilje på kamera som straff 😂"},
+      {text:"Spill en tilfeldig TikTok-lyd – alle MÅ lage en dans med en gang. Ingen forberedelse! 📱",cat:"video",cam:true,p:"Den med dårligste improvisasjon velger neste lyd 😂"},
       {text:"Alle gjør det samme bevegelsesmønsteret – men én person er 3 sekunder forsinket uten å vite det. Kamera fanger alt 🔄",cat:"video",cam:true,p:"Den som oppdaget det sist er forsinket dobbelt neste gang 😂"},
-      {text:"To personer bytter telefon og sender én melding til en tilfeldig kontakt som om de er den andre personen. Kamera på reaksjonene 📱",cat:"video",cam:true,p:"Den med den morsomste meldingen velger neste utfordring 🎯"},
-      {text:"Alle sier det samme ordet samtidig – men prøver å si det i akkurat samme rytme og toneleie. Film forsøkene. Første gang alle treffer vinner 🎵",cat:"video",cam:true,p:"Mest off-tune person velger neste ord 😂"},
+      {text:"Bytt telefon! Send én melding til en tilfeldig kontakt som om du ER den andre. Film reaksjonene 📱",cat:"video",cam:true,p:"Den med den morsomste meldingen velger neste utfordring 🎯"},
+      {text:"Alle sier samme ord – prøv å si det i akkurat samme rytme. Film. Første gang alle treffer vinner! 🎵",cat:"video",cam:true,p:"Mest off-tune person velger neste ord 😂"},
     ]
   }
 };
@@ -2429,6 +2438,10 @@ function sendToApp(txt,platform){
 async function openCamera(){
   const overlay=document.getElementById('cam-overlay');
   overlay.classList.add('on');
+  // Vis hint første gang
+  if(!localStorage.getItem('na_cam_hint')){
+    setTimeout(()=>{document.getElementById('cam-hint').style.display='block';},800);
+  }
   document.getElementById('cam-filter-challenge').textContent=S.challenge||'NÅ-utfordring';
   document.getElementById('cam-filter-user').textContent='@'+PL.name+' • 🔥'+PL.streak+' streak';
   setCamMode(S.needsCamera?'video':'photo');
