@@ -776,7 +776,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
       </div>
 
       <!-- NESTE -->
-      <button class="btn btn-primary" style="margin-top:14px;font-size:17px;" onclick="nextChallenge()">Neste utfordring 🎯</button>
+      <button class="btn btn-primary" style="margin-top:14px;font-size:18px;padding:18px;letter-spacing:.3px;" onclick="nextChallenge()">🎯 Neste utfordring!</button>
       <button class="btn btn-ghost" style="font-size:13px;padding:11px;margin-top:6px;" onclick="inviteFriend('snap')">👻 Utfordre en venn på Snap</button>
     </div>
     <!-- SPILL MED VENN — nederst -->
@@ -1568,13 +1568,20 @@ const SPECIAL={
 };
 
 const DAILY_POOL=[
-  {text:"Send en melding til noen du ikke har snakket med på lenge 💬",em:"💌"},
-  {text:"Gjør noe du aldri har gjort før i dag – stort eller lite 🌟",em:"🌟"},
-  {text:"Lær deg én ny ting på 10 minutter og del det med noen 🧠",em:"🧠"},
-  {text:"Ta én selfie et sted du aldri har tatt selfie før 📸",em:"📸",cam:true},
-  {text:"Gi noen et genuint kompliment ansikt til ansikt 😊",em:"😊"},
-  {text:"Gå en tur uten telefon i 15 minutter og observer omgivelsene 🚶",em:"🚶"},
-  {text:"Skriv ned tre ting du er takknemlig for i dag ✍️",em:"✍️"},
+  {text:"Ta et dramatisk selfie i den mest kjedelige settingen du finner i dag 😐",em:"📸",cam:true},
+  {text:"Film deg selv mens du forklarer hva du spiste til frokost som om det er verdens beste måltid 🍳",em:"🎬",cam:true},
+  {text:"Finn noe hjemme som ligner et kjent ansikt og ta bilde av det 👀",em:"📸",cam:true},
+  {text:"Ta bilde av skyggen din i den rareste posituren du klarer 🕶️",em:"📸",cam:true},
+  {text:"Film deg selv mens du danser til første sang på shuffle. Full innsats! 🕺",em:"🎵",cam:true},
+  {text:"Finn det styggeste objektet hjemme og ta et kunstnerisk nærbilde av det 🎨",em:"📸",cam:true},
+  {text:"Ta bilde av noe i nabolaget som du aldri har lagt merke til før 🔍",em:"📸",cam:true},
+  {text:"Film en 15-sekunders reklame for det kjedeligste du ser akkurat nå 📺",em:"🎬",cam:true},
+  {text:"Ta bilde av det morsomste du ser i dag – ute eller inne 😂",em:"📸",cam:true},
+  {text:"Film deg selv mens du gjør 10 push-ups og kommenter hvert eneste ett 💪",em:"🎬",cam:true},
+  {text:"Ta bilde av hendene dine mens du gjør noe helt vanlig – men gjør det episk 🙌",em:"📸",cam:true},
+  {text:"Film deg selv mens du synger med på en sang du bare halvt kan 🎤",em:"🎬",cam:true},
+  {text:"Ta bilde av noe blått, rødt og gult du finner i dag 🎨",em:"📸",cam:true},
+  {text:"Film en 20-sekunders vær-melding fra der du er akkurat nå 🌤️",em:"🎬",cam:true},
 ];
 
 const BADGES=[
@@ -1797,9 +1804,18 @@ function renderDaily(){
   if(PL.dailyDone){
     el.innerHTML=`<div class="daily-card"><div class="daily-top"><div class="daily-lbl">📅 Dagens utfordring</div><div class="daily-countdown">Neste om ${getCountdown()}</div></div><div class="daily-txt">${d.em} ${d.text}</div><div class="daily-done">✅ Fullført i dag! +10 pts</div></div>`;
   }else{
-    el.innerHTML=`<div class="daily-card"><div class="daily-top"><div class="daily-lbl">📅 Dagens utfordring</div><div class="daily-countdown">Utløper om ${getCountdown()}</div></div><div class="daily-txt">${d.em} ${d.text}</div><button class="daily-btn" onclick="completeDaily()">Gjort det! +10 pts ✓</button></div>`;
+    el.innerHTML=`<div class="daily-card"><div class="daily-top"><div class="daily-lbl">📅 Dagens utfordring</div><div class="daily-countdown">Utløper om ${getCountdown()}</div></div><div class="daily-txt">${d.em} ${d.text}</div><div style="display:flex;gap:8px;margin-top:12px;"><button class="daily-btn" style="flex:1;" onclick="openDailyCamera()">📸 Ta bilde + fullfør</button></div></div>`;
   }
 }
+function openDailyCamera(){
+  const d=getDailyChallenge();
+  S.challenge=d.text;
+  S.needsCamera=true;
+  S.proofMode=true;
+  S.dailyMode=true; // flagg for å vite at vi er i daily-modus
+  openCamera();
+}
+
 function completeDaily(){
   if(PL.dailyDone)return;
   PL.dailyDone=true;
@@ -1975,7 +1991,7 @@ function showChallenge(c){
   startTimer(S.time||'10 min');
 
   show('s-challenge');
-  if(S.needsCamera)setTimeout(()=>openCamera(),800);
+  if(S.needsCamera)setTimeout(()=>openCamera(),2500);
   vibrate();playSound('pop');
 }
 
