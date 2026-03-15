@@ -1744,13 +1744,9 @@ function updateHeader(){
 // INSTALL
 // ══════════════════════════════════════════
 function renderInstallBanner(){
+  // Skjult — kommer i App Store-versjon
   const el=document.getElementById('install-wrap');
-  if(window.navigator.standalone||localStorage.getItem('na_installed')){el.innerHTML='';return;}
-  el.innerHTML=`<div class="install-banner" onclick="showInstallOverlay()">
-    <div class="install-icon">📱</div>
-    <div><div class="install-title">Legg til som app!</div><div class="install-sub">Få NÅ på hjemskjermen – ingen App Store nødvendig</div></div>
-    <div class="install-arrow">›</div>
-  </div>`;
+  if(el)el.innerHTML='';
 }
 function showInstallOverlay(){document.getElementById('install-overlay').classList.add('on')}
 function closeInstall(){
@@ -1938,8 +1934,18 @@ function showChallenge(c){
 
   // Punishment
   const pu=document.getElementById('punish');
-  if(S.punishment&&isGroup){document.getElementById('punish-txt').textContent=S.punishment;pu.style.display='block';}
-  else pu.style.display='none';
+  if(S.punishment&&isGroup){
+    // Sjekk om utfordringen er en konkurranse (alle gjør samme) vs én person
+    const challengeTxt=S.challenge||'';
+    const isSoloTask=challengeTxt.match(/én (person|er|gjør|velger|roper|er guide|er regissør|er reporter)/i)||
+                     challengeTxt.match(/^(én|en person|én person)/i);
+    if(!isSoloTask){
+      document.getElementById('punish-txt').textContent=S.punishment;
+      pu.style.display='block';
+    } else {
+      pu.style.display='none';
+    }
+  } else pu.style.display='none';
 
   // Reset proof bar
   resetProofBar();
@@ -2303,7 +2309,7 @@ function skipChallenge(){
   PL.pts=Math.max(0,PL.pts-5);
   LB[0].pts=PL.pts;
   updateHeader();saveData();
-  toast(lost>0?'⏭ Hoppet over – −'+lost+' poeng 😬':'⏭ Hoppet over 😅');
+  toast(lost>0?'⏭ Hoppet over – −'+lost+' poeng 😂😂':'⏭ Hoppet over 😂😂');
   vibrate();
   setTimeout(()=>nextChallenge(),700);
 }
