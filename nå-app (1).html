@@ -618,6 +618,25 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
     </div>
   </div>
 
+  <!-- GRUPPE VELGER -->
+  <div class="screen" id="s-group" style="flex-direction:column;gap:14px;padding-top:48px;">
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:1px;">HVEM ER MED? 👥</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:600;margin-top:4px;">Velg hvem som spiller — de får poeng også!</div>
+    </div>
+    <div id="group-friends-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;">
+      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;">➕ Legg til noen som ikke er på listen</div>
+      <div style="display:flex;gap:8px;">
+        <input id="group-manual-input" placeholder="Navn..." style="flex:1;padding:11px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:600;outline:none;" oninput="" onkeydown="if(event.key==='Enter')addGroupManual()">
+        <button onclick="addGroupManual()" style="padding:11px 16px;background:linear-gradient(135deg,var(--red),var(--orange));color:#fff;border:none;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;cursor:pointer;">Legg til</button>
+      </div>
+    </div>
+    <div id="group-selected-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+    <button class="btn btn-primary" style="font-size:16px;padding:17px;" onclick="confirmGroup()">Klar! Start utfordring 🚀</button>
+    <button class="btn btn-ghost" style="font-size:13px;padding:12px;" onclick="show('s-setup');wizNext(2);">← Endre antall</button>
+  </div>
+
   <!-- REVEAL -->
   <div class="screen" id="s-reveal" style="flex-direction:column;align-items:center;padding:40px 0 20px;gap:0;">
     <div style="text-align:center;margin-bottom:32px;">
@@ -1061,7 +1080,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
 // ══════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════
-const S={mood:null,time:null,players:null,challenge:null,punishment:null,code:null,wizStep:0,needsCamera:false};
+const S={mood:null,time:null,players:null,challenge:null,punishment:null,code:null,wizStep:0,needsCamera:false,groupMembers:[],pendingSharePlatform:null};
 let PL={name:'',emoji:'🔥',age:'16-19',pts:0,streak:0,best:0,done:0,history:[],earnedBadges:[],dailyDone:false,dailyDate:''};
 let selectedEmoji='🔥';
 let selectedAge='16-19';
@@ -1844,7 +1863,7 @@ function restoreSelections(step){
 function wizBack(step){wizNext(step-1);}
 function backToSetup(){
   stopTimer();
-  S.mood=null;S.time=null;S.players=null;S.wizStep=0;
+  S.mood=null;S.time=null;S.players=null;S.wizStep=0;S.groupMembers=[];
   navTo('s-setup','n0');wizNext(0);
 }
 
@@ -1932,13 +1951,74 @@ function showChallenge(c){
 function start(){
   if(!S.mood||!S.time||!S.players)return;
   S.pendingChallenge=getChallenge();
+  // Hvis gruppe — vis vennevalg først
+  if(S.players!==1){
+    showGroupSelect();
+    return;
+  }
+  showReveal();
+}
+
+function showReveal(){
   const moodEmoji={Energisk:'⚡',Avslappet:'😌','Lei og rastløs':'😒','Klar for galskap':'🔥'};
-  const playersLabel=S.players===1?'👤 Solo':'👥 '+S.players+' pers.';
+  const playersLabel=S.players===1?'👤 Solo':(S.groupMembers&&S.groupMembers.length>0?'👥 '+S.groupMembers.map(m=>m.name).join(', '):'👥 '+S.players+' pers.');
   document.getElementById('reveal-tags').innerHTML=
     '<span style="background:var(--card);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--muted);">'+moodEmoji[S.mood]+' '+S.mood+'</span>'+
     '<span style="background:var(--card);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--muted);">⏱ '+S.time+'</span>'+
     '<span style="background:var(--card);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--muted);">'+playersLabel+'</span>';
   show('s-reveal');
+}
+
+function showGroupSelect(){
+  S.groupMembers=S.groupMembers||[];
+  const list=document.getElementById('group-friends-list');
+  list.innerHTML='';
+  // Vis venner fra vennelisten
+  const friends=PL.friends||[];
+  if(friends.length===0){
+    list.innerHTML='<div style="font-size:13px;color:var(--muted);text-align:center;padding:16px;">Ingen venner ennå — legg til manuelt under 👇</div>';
+  } else {
+    friends.forEach(f=>{
+      const isSelected=S.groupMembers.some(m=>m.code===f.code);
+      const card=document.createElement('div');
+      card.style.cssText='background:var(--card);border:1.5px solid '+(isSelected?'var(--red)':'var(--border)')+';border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s;';
+      card.innerHTML='<div style="font-size:24px;">'+f.emoji+'</div><div style="flex:1;"><div style="font-size:14px;font-weight:700;">'+f.name+'</div><div style="font-size:11px;color:var(--muted);">'+f.pts+' pts · '+f.streak+' streak</div></div>'+(isSelected?'<div style="color:var(--red);font-size:18px;">✓</div>':'');
+      card.onclick=()=>{
+        if(isSelected){S.groupMembers=S.groupMembers.filter(m=>m.code!==f.code);}
+        else{S.groupMembers.push({name:f.name,emoji:f.emoji,code:f.code});}
+        showGroupSelect();
+      };
+      list.appendChild(card);
+    });
+  }
+  renderGroupSelected();
+  show('s-group');
+}
+
+function addGroupManual(){
+  const input=document.getElementById('group-manual-input');
+  const name=input.value.trim();
+  if(!name)return;
+  if(!S.groupMembers)S.groupMembers=[];
+  if(!S.groupMembers.some(m=>m.name===name)){
+    S.groupMembers.push({name,emoji:'👤',code:null});
+  }
+  input.value='';
+  renderGroupSelected();
+}
+
+function renderGroupSelected(){
+  const list=document.getElementById('group-selected-list');
+  if(!S.groupMembers||S.groupMembers.length===0){
+    list.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;">Ingen valgt ennå — du spiller solo</div>';
+    return;
+  }
+  list.innerHTML='<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Med i spillet:</div>'+
+    S.groupMembers.map(m=>'<div style="background:rgba(255,45,85,.08);border:1px solid rgba(255,45,85,.2);border-radius:10px;padding:8px 14px;display:flex;align-items:center;gap:8px;"><span style="font-size:18px;">'+m.emoji+'</span><span style="font-size:13px;font-weight:700;">'+m.name+'</span></div>').join('');
+}
+
+function confirmGroup(){
+  showReveal();
 }
 
 function startRevealCountdown(){
@@ -2184,11 +2264,29 @@ function completeChallenge(){
   avatarDrop();vibrate();playSound('complete');
   checkBadges();
 
-  // Save to Supabase
+  // Lagre til Supabase
   sbSaveProfile();
   if(S.code)sbMarkCompleted(S.code);
 
-  if(bonus>0)toast('⚡ Rask! +'+pts+' poeng ('+bonus+' bonuspoeng)!');
+  // Gi poeng til alle gruppemedlemmer
+  if(S.groupMembers&&S.groupMembers.length>0){
+    S.groupMembers.forEach(async m=>{
+      if(m.code){
+        // Hent profil og oppdater poeng
+        const profile=await sbLookupFriend(m.code);
+        if(profile){
+          const newPts=(profile.pts||0)+pts;
+          const newDone=(profile.done||0)+1;
+          await sbFetch('/rest/v1/profiles?friend_code=eq.'+encodeURIComponent(m.code),'PATCH',{pts:newPts,done:newDone,last_seen:new Date().toISOString()});
+        }
+      }
+    });
+    const names=S.groupMembers.map(m=>m.name).join(', ');
+    toast('🎉 +'+pts+' pts til deg og '+names+'!');
+  } else {
+    if(bonus>0)toast('⚡ Rask! +'+pts+' poeng ('+bonus+' bonuspoeng)!');
+  }
+
   setTimeout(()=>showResult(pts),900);
 }
 
