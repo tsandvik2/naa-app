@@ -1079,7 +1079,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
 // STATE
 // ══════════════════════════════════════════
 const S={mood:null,time:null,players:null,challenge:null,punishment:null,code:null,wizStep:0,needsCamera:false,groupMembers:[],pendingSharePlatform:null,sharedThisChallenge:false};
-let PL={name:'',emoji:'🔥',age:'16-19',pts:0,streak:0,best:0,done:0,history:[],earnedBadges:[],dailyDone:false,dailyDate:''};
+let PL={name:'',emoji:'🔥',age:'16-19',pts:0,streak:0,best:0,done:0,history:[],earnedBadges:[],dailyDone:false,dailyDate:'',dailyPtsDate:'',dailyPtsCount:0,dailyShareDate:'',dailyShareCount:0,sharedChallenges:[]};
 let selectedEmoji='🔥';
 let selectedAge='16-19';
 let camStream=null;
@@ -1784,7 +1784,13 @@ function renderDaily(){
 function completeDaily(){
   if(PL.dailyDone)return;
   PL.dailyDone=true;
-  PL.pts+=10;PL.done++;PL.streak++;
+  PL.dailyDate=new Date().toDateString();
+  PL.pts+=10;PL.done++;
+  // Streak med dagsjekk
+  const today=new Date().toDateString();
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  if(PL.streakDate===yesterday){PL.streak++;PL.streakDate=today;}
+  else if(PL.streakDate!==today){PL.streak=1;PL.streakDate=today;}
   if(PL.streak>PL.best)PL.best=PL.streak;
   addToHistory(getDailyChallenge().text,'easy');
   LB[0].pts=PL.pts;LB[0].streak=PL.streak;
@@ -1792,6 +1798,7 @@ function completeDaily(){
   avatarDrop();vibrate();playSound('complete');
   toast('📅 +10 poeng! Streak: '+PL.streak+' 🔥');
   checkBadges();
+  sbSaveProfile();
 }
 
 // ══════════════════════════════════════════
@@ -2248,6 +2255,15 @@ function completeChallenge(){
   const bonus=pct>0.7?5:pct>0.4?2:0;
   const pts=10+bonus;
 
+  // Maks 10 utfordringer med poeng per dag
+  const todayStr=new Date().toDateString();
+  if(!PL.dailyPtsDate||PL.dailyPtsDate!==todayStr){PL.dailyPtsDate=todayStr;PL.dailyPtsCount=0;}
+  if(PL.dailyPtsCount>=10){
+    toast('Du har nådd maks utfordringer for i dag! Kom tilbake i morgen 💪');
+    pts=0;
+  } else {
+    PL.dailyPtsCount=(PL.dailyPtsCount||0)+1;
+  }
   PL.pts+=pts;PL.done++;
   // Streak: kun én gang per dag
   const today=new Date().toDateString();
@@ -2319,14 +2335,26 @@ function showResult(pts){
 // ══════════════════════════════════════════
 // ── QUICK SHARE — 1 tap: lagrer video/bilde + åpner app ──
 function shareAndGetPoints(platform){
-  // Gi +5 pts for deling — kun én gang per utfordring
-  if(!S.sharedThisChallenge){
-    S.sharedThisChallenge=true;
-    PL.pts+=5;
-    LB[0].pts=PL.pts;
-    updateHeader();saveData();
-    sbSaveProfile();
-    toast('🔥 +5 pts for deling!');
+  // +5 pts for deling — kun én gang per utfordring, lagres i history
+  const challengeKey='share_'+btoa(S.challenge||'').substring(0,10);
+  if(!PL.sharedChallenges)PL.sharedChallenges=[];
+  if(!PL.sharedChallenges.includes(challengeKey)){
+    PL.sharedChallenges.push(challengeKey);
+    // Behold kun siste 50
+    if(PL.sharedChallenges.length>50)PL.sharedChallenges.shift();
+    // Maks 3 del-poeng per dag
+    const todayStr=new Date().toDateString();
+    if(!PL.dailyShareDate||PL.dailyShareDate!==todayStr){PL.dailyShareDate=todayStr;PL.dailyShareCount=0;}
+    if((PL.dailyShareCount||0)<3){
+      PL.dailyShareCount=(PL.dailyShareCount||0)+1;
+      PL.pts+=5;
+      LB[0].pts=PL.pts;
+      updateHeader();saveData();
+      sbSaveProfile();
+      toast('🔥 +5 pts for deling! ('+PL.dailyShareCount+'/3 i dag)');
+    } else {
+      toast('Du har fått del-poeng 3 ganger i dag allerede! 😄');
+    }
   }
   quickShare(platform);
 }
