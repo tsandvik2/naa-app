@@ -1256,7 +1256,8 @@ async function sbMarkCompleted(code){
 
 // ── Leaderboard from Supabase ──
 async function sbFetchLeaderboard(){
-  const res=await sbFetch('/rest/v1/profiles?select=name,emoji,pts,streak&order=pts.desc&limit=10');
+  // Kun folk med poeng, og hent friend_code for å identifisere deg selv
+  const res=await sbFetch('/rest/v1/profiles?select=name,emoji,pts,streak,friend_code&order=pts.desc&limit=20&pts=gt.0');
   return res||[];
 }
 
@@ -2779,27 +2780,35 @@ async function lbTab(btn){
   btn.classList.add('on');renderLB();
 }
 async function renderLB(){
-  // Show local data instantly while fetching
+  // Vis egne data umiddelbart
   LB[0].pts=PL.pts;LB[0].em=PL.emoji;LB[0].name=PL.name;LB[0].streak=PL.streak;
-  drawLB(LB);
+  if(PL.pts>0)drawLB(LB);
+  else drawLB([]);
 
-  // Fetch real data from Supabase
-  const remote=await sbFetchLeaderboard();
-  if(remote&&remote.length>0){
-    // Merge: map remote to LB format, mark current user
-    const rows=remote.map(r=>({
-      name:r.name,
-      em:r.emoji||'🔥',
-      pts:r.pts||0,
-      streak:r.streak||0,
-      me:r.name===PL.name&&r.friend_code===getMyCode()
-    }));
-    // Ensure current user always in list
-    if(!rows.find(r=>r.me)){
-      rows.push({name:PL.name,em:PL.emoji,pts:PL.pts,streak:PL.streak,me:true});
+  // Hent fra Supabase
+  try{
+    const remote=await sbFetchLeaderboard();
+    if(remote&&remote.length>0){
+      const myCode=getMyCode();
+      const rows=remote.map(r=>({
+        name:r.name,
+        em:r.emoji||'🔥',
+        pts:r.pts||0,
+        streak:r.streak||0,
+        done:r.done||0,
+        me:r.friend_code===myCode
+      }));
+      // Legg til deg selv hvis du har poeng og ikke er på listen
+      if(PL.pts>0&&!rows.find(r=>r.me)){
+        rows.push({name:PL.name,em:PL.emoji,pts:PL.pts,streak:PL.streak,me:true});
+        rows.sort((a,b)=>b.pts-a.pts);
+      }
+      drawLB(rows.slice(0,10));
+    } else if(PL.pts===0){
+      // Ingen på lista ennå
+      drawLB([]);
     }
-    drawLB(rows);
-  }
+  }catch(e){console.log('LB feil:',e);}
 }
 function drawLB(data){
   const sorted=[...data].sort((a,b)=>b.pts-a.pts);
@@ -2814,12 +2823,22 @@ function drawLB(data){
       <div class="pod-pts">${p.pts} pts</div>
       <div class="pod-bar" style="height:${barH[i]}px;background:${barC[i]}"></div>
     </div>`).join('');
+  if(!sorted||sorted.length===0){
+    document.getElementById('podium').innerHTML=
+      '<div style="text-align:center;padding:32px 20px;">'+
+      '<div style="font-size:52px;margin-bottom:12px;">🏆</div>'+
+      '<div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">Ingen på lista ennå!</div>'+
+      '<div style="font-size:13px;color:var(--muted);line-height:1.5;">Fullfør utfordringer og del med venner<br>for å komme på leaderboard 🔥</div>'+
+      '</div>';
+    document.getElementById('lb-list').innerHTML='';
+    return;
+  }
   document.getElementById('lb-list').innerHTML=sorted.map((p,i)=>`
     <div class="lb-row${p.me?' me':''}">
-      <div class="lb-pos">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
-      <div class="lb-av">${p.em||p.emoji||'👤'}</div>
-      <div class="lb-info"><div class="lb-name">${p.name}${p.me?' (deg)':''}</div><div class="lb-detail">🔥 ${p.streak} streak</div></div>
-      <div class="lb-pts">${p.pts}</div>
+      <div class="lb-pos">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'<span style=\"font-size:13px;font-weight:800;\">'+(i+1)+'</span>'}</div>
+      <div class="lb-av" style="font-size:26px;width:40px;height:40px;background:var(--card2);border-radius:50%;display:flex;align-items:center;justify-content:center;">${p.em||p.emoji||'👤'}</div>
+      <div class="lb-info"><div class="lb-name">${p.name}${p.me?' <span style=\"color:var(--red);font-size:11px;\">deg</span>':''}</div><div class="lb-detail">🔥 ${p.streak} streak · ${p.done||0} fullført</div></div>
+      <div class="lb-pts" style="font-family:'Bebas Neue',sans-serif;font-size:22px;">${p.pts}<span style="font-size:10px;font-weight:600;color:var(--muted);"> pts</span></div>
     </div>`).join('');
 }
 
