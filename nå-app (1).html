@@ -755,10 +755,9 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
       <div class="result-pts" id="result-pts">0</div>
       <div class="result-pts-lbl">POENG TOTALT</div>
 
-      <!-- STEG 1: Del video -->
-      <div class="share-section" id="share-step1">
-        <div class="share-title">📲 Del på sosiale medier</div>
-        <div class="share-subtitle">Lagrer video til kamera → åpner appen</div>
+      <!-- DEL -->
+      <div style="margin-top:16px;">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Del med verden 🔥</div>
         <div class="share-btns-row">
           <button class="share-big-btn share-tiktok" onclick="quickShare('tiktok')">
             <span class="sbb-icon">🎵</span>
@@ -773,27 +772,11 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
             <span class="sbb-label">Reels</span>
           </button>
         </div>
-        <button class="btn-cam-result" onclick="openCameraFromResult()">🎥 Film med NÅ-filter først</button>
       </div>
 
-      <!-- STEG 2: Utfordre venn -->
-      <div class="share-section" id="share-step2">
-        <div class="share-divider">— eller —</div>
-        <div class="share-title">👯 Utfordre en venn!</div>
-        <div class="share-subtitle">Send utfordringen direkte — de får samme utfordring</div>
-        <div class="share-btns-row">
-          <button class="share-big-btn share-snap" onclick="inviteFriend('snap')">
-            <span class="sbb-icon">👻</span>
-            <span class="sbb-label">Send på Snap</span>
-          </button>
-          <button class="share-big-btn share-sms" onclick="inviteFriend('sms')">
-            <span class="sbb-icon">💬</span>
-            <span class="sbb-label">Send SMS</span>
-          </button>
-        </div>
-      </div>
-
-      <button class="btn btn-primary" style="margin-top:16px" onclick="nextChallenge()">Neste utfordring 🎯</button>
+      <!-- NESTE -->
+      <button class="btn btn-primary" style="margin-top:14px;font-size:17px;" onclick="nextChallenge()">Neste utfordring 🎯</button>
+      <button class="btn btn-ghost" style="font-size:13px;padding:11px;margin-top:6px;" onclick="inviteFriend('snap')">👻 Utfordre en venn på Snap</button>
     </div>
     <!-- SPILL MED VENN — nederst -->
     <div class="friend-box" id="friend-box">
