@@ -522,7 +522,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
 
 <!-- ══ ONBOARDING ══ -->
 <div class="ob-screen active" id="ob0">
-  <div class="ob-logo">NÅ</div>
+  <div class="ob-logo">N<span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;background:inherit;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Å</span></div>
   <div class="ob-tagline">Slutt å scrolle.<br>Begynn å leve.</div>
   <div class="ob-features">
     <div class="ob-feat"><div class="ob-feat-icon">🎯</div><div><div class="ob-feat-title">Utfordringer tilpasset deg</div><div class="ob-feat-desc">Basert på humør, tid og antall</div></div></div>
@@ -560,7 +560,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
 <!-- ══ MAIN APP ══ -->
 <div class="app" id="main-app" style="display:none">
   <div class="header">
-    <div><div class="logo">NÅ</div><div class="logo-sub">Hva gjør vi nå?</div></div>
+    <div><div class="logo">N<span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;">Å</span></div><div class="logo-sub">Hva gjør vi nå?</div></div>
     <div class="user-pill" onclick="navTo('s-profile','n2')">
       <span class="user-em" id="hdr-em">🔥</span>
       <div><div class="user-name" id="hdr-name">–</div><div class="user-pts" id="hdr-pts">0 pts</div></div>
@@ -642,7 +642,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
     <div style="text-align:center;margin-bottom:32px;">
       <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;" id="reveal-summary-label">Klar til å starte?</div>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;" id="reveal-tags"></div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:88px;letter-spacing:6px;color:var(--text);line-height:1;margin-bottom:6px;filter:drop-shadow(0 0 24px rgba(255,45,85,.5));">NÅ</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:88px;letter-spacing:6px;color:var(--text);line-height:1;margin-bottom:6px;filter:drop-shadow(0 0 24px rgba(255,45,85,.5));">N<span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;">Å</span></div>
       <div style="font-size:15px;color:var(--muted);font-weight:500;">Din utfordring venter</div>
     </div>
     <button class="btn btn-primary" style="width:100%;font-size:17px;padding:18px;" onclick="startRevealCountdown()">START UTFORDRING</button>
@@ -757,17 +757,17 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
 
       <!-- DEL -->
       <div style="margin-top:16px;">
-        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Del med verden 🔥</div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Del med verden +5 pts 🔥</div>
         <div class="share-btns-row">
-          <button class="share-big-btn share-tiktok" onclick="quickShare('tiktok')">
+          <button class="share-big-btn share-tiktok" onclick="shareAndGetPoints('tiktok')">
             <span class="sbb-icon">🎵</span>
             <span class="sbb-label">TikTok</span>
           </button>
-          <button class="share-big-btn share-snap" onclick="quickShare('snap')">
+          <button class="share-big-btn share-snap" onclick="shareAndGetPoints('snap')">
             <span class="sbb-icon">👻</span>
             <span class="sbb-label">Snapchat</span>
           </button>
-          <button class="share-big-btn share-insta" onclick="quickShare('insta')">
+          <button class="share-big-btn share-insta" onclick="shareAndGetPoints('insta')">
             <span class="sbb-icon">📸</span>
             <span class="sbb-label">Reels</span>
           </button>
@@ -975,7 +975,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
     <div class="cam-filter-corner br"></div>
     <!-- Top -->
     <div class="cam-filter-top">
-      <div class="cam-filter-logo">NÅ</div>
+      <div class="cam-filter-logo">N<span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;">Å</span></div>
       <div class="cam-filter-tag" id="cam-filter-tag">🔥 Utfordring</div>
     </div>
     <!-- TikTok-side knapper -->
@@ -1028,7 +1028,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
   <img class="cam-preview-img" id="cam-preview-img" src="" alt="">
   <div class="cam-preview-filter">
     <div class="cam-filter-top">
-      <div class="cam-filter-logo">NÅ</div>
+      <div class="cam-filter-logo">N<span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;">Å</span></div>
       <div class="cam-filter-tag">Jeg ble utfordret!</div>
     </div>
     <div class="cam-filter-bottom">
@@ -1052,7 +1052,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
   <video class="cam-preview-img" id="vid-preview-video" controls playsinline style="object-fit:cover;width:100%;height:100%"></video>
   <div class="cam-preview-filter" style="pointer-events:none">
     <div class="cam-filter-top">
-      <div class="cam-filter-logo">NÅ</div>
+      <div class="cam-filter-logo">N<span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;">Å</span></div>
       <div class="cam-filter-tag">Jeg ble utfordret!</div>
     </div>
     <div class="cam-filter-bottom">
@@ -1078,7 +1078,7 @@ html,body{height:100%;background:#000;background:var(--bg);color:var(--text);fon
 // ══════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════
-const S={mood:null,time:null,players:null,challenge:null,punishment:null,code:null,wizStep:0,needsCamera:false,groupMembers:[],pendingSharePlatform:null};
+const S={mood:null,time:null,players:null,challenge:null,punishment:null,code:null,wizStep:0,needsCamera:false,groupMembers:[],pendingSharePlatform:null,sharedThisChallenge:false};
 let PL={name:'',emoji:'🔥',age:'16-19',pts:0,streak:0,best:0,done:0,history:[],earnedBadges:[],dailyDone:false,dailyDate:''};
 let selectedEmoji='🔥';
 let selectedAge='16-19';
@@ -1857,7 +1857,7 @@ function restoreSelections(step){
 function wizBack(step){wizNext(step-1);}
 function backToSetup(){
   stopTimer();
-  S.mood=null;S.time=null;S.players=null;S.wizStep=0;S.groupMembers=[];
+  S.mood=null;S.time=null;S.players=null;S.wizStep=0;S.groupMembers=[];S.sharedThisChallenge=false;
   navTo('s-setup','n0');wizNext(0);
 }
 
@@ -2318,6 +2318,19 @@ function showResult(pts){
 // SHARING
 // ══════════════════════════════════════════
 // ── QUICK SHARE — 1 tap: lagrer video/bilde + åpner app ──
+function shareAndGetPoints(platform){
+  // Gi +5 pts for deling — kun én gang per utfordring
+  if(!S.sharedThisChallenge){
+    S.sharedThisChallenge=true;
+    PL.pts+=5;
+    LB[0].pts=PL.pts;
+    updateHeader();saveData();
+    sbSaveProfile();
+    toast('🔥 +5 pts for deling!');
+  }
+  quickShare(platform);
+}
+
 function quickShare(platform){
   const appUrls={tiktok:'tiktok://',snap:'snapchat://',insta:'instagram://story-camera'};
   const names={tiktok:'TikTok 🎵',snap:'Snapchat 👻',insta:'Instagram 📸'};
